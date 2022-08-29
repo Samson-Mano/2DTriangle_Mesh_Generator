@@ -14,6 +14,9 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
         private int _y;
         private Color _pt_clr = Color.Red;
 
+        private double pt_paint_x;
+        private double pt_paint_y;
+
         public int pt_id { get; private set; }
 
         public double d_x { get; private set; }
@@ -24,8 +27,8 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
         {
             float[] vertex_coord = new float[3];
             // Add vertex to list
-            vertex_coord[0] = (float)d_x;
-            vertex_coord[1] = (float)d_y;
+            vertex_coord[0] = (float)pt_paint_x;
+            vertex_coord[1] = (float)pt_paint_y;
             vertex_coord[2] = 0.0f;
 
             return vertex_coord;
@@ -42,6 +45,12 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             vertex_clr[3] = ((float)this._pt_clr.A / 255.0f);
 
             return vertex_clr;
+        }
+
+        public void update_scale(double d_scale, double tran_tx, double tran_ty)
+        {
+            this.pt_paint_x = (d_x - tran_tx) * d_scale;
+            this.pt_paint_y = (d_y - tran_ty) * d_scale;
         }
 
         public float[] get_point_vertices()
@@ -112,59 +121,6 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
         public override int GetHashCode()
         {
             return HashCode.Combine(this.pt_id, this._x, this._y);
-        }
-    }
-
-
-    public class PointsComparer : IComparer<point_store>
-    {
-        private int center_x = 0;
-        private int center_y = 0;
-
-        public PointsComparer(double c_x, double c_y)
-        {
-            this.center_x = (int)(c_x * 100000);
-            this.center_y = (int)(c_y * 100000);
-        }
-
-        public int Compare(point_store a, point_store b)
-        {
-            // Sort points in clockwise order
-            // https://stackoverflow.com/questions/6989100/sort-points-in-clockwise-order
-            int a_x = (int)(a.d_x * 100000);
-            int a_y = (int)(a.d_y * 100000);
-
-            int b_x = (int)(b.d_x * 100000);
-            int b_y = (int)(b.d_y * 100000);
-
-            // Both points are equal
-            if (a_x == b_x && a_y == b_y)
-                return 0;
-
-            if (a_x - center_x >= 0 && b_x - center_x < 0)
-                return 1;
-            if (a_x - center_x < 0 && b_x - center_x >= 0)
-                return -1;
-            if (a_x - center_x == 0 && b_x - center_x == 0)
-            {
-                if (a_y - center_y >= 0 || b_y - center_y >= 0)
-                    return (a_y > b_y ? 1 : -1);
-                return (b_y > a_y ? 1 : -1);
-            }
-
-            // compute the cross product of vectors (center -> a) x (center -> b)
-            int det = (a_x - center_x) * (b_y - center_y) - (b_x - center_x) * (a_y - center_y);
-            if (det < 0)
-                return 1;
-            if (det > 0)
-                return -1;
-
-            // points a and b are on the same line from the center
-            // check which point is closer to the center
-            int d1 = (a_x - center_x) * (a_x - center_x) + (a_y - center_y) * (a_y - center_y);
-            int d2 = (b_x - center_x) * (b_x - center_x) + (b_y - center_y) * (b_y - center_y);
-            return (d1 > d2 ? 1 : -1);
-
         }
     }
 }

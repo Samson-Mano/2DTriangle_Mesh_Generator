@@ -48,6 +48,15 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             return false;
         }
 
+        public void update_scale(double d_scale, double tran_tx, double tran_ty)
+        {
+            // update the scale of the point
+            this.pt0.update_scale(d_scale, tran_tx, tran_ty);
+            this.pt1.update_scale(d_scale, tran_tx, tran_ty);
+            this.pt2.update_scale(d_scale, tran_tx, tran_ty);
+        }
+
+
         private bool is_point_attached(point_store pt)
         {
             if (this.pt0.Equals(pt) ||

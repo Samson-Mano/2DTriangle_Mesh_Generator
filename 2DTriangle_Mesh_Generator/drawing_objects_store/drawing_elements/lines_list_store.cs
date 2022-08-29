@@ -85,6 +85,12 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             GL.DrawElements(PrimitiveType.Lines, this._line_indices.Length, DrawElementsType.UnsignedInt, 0);
         }
 
+        public void update_scale(double d_scale, double tran_tx, double tran_ty)
+        {
+            // update scale of all the line pts
+            this.all_line_pts.update_scale(d_scale, tran_tx, tran_ty);
+        }
+
         public void add_line(int ln_id, double spt_x, double spt_y, Color spt_clr,
                      double ept_x, double ept_y, Color ept_clr)
         {

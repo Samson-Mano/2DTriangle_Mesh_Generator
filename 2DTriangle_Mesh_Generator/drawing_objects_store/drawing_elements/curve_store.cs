@@ -61,6 +61,16 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             this.curve_t_pts = temp.Item2;
         }
 
+
+        public void update_scale(double d_scale, double tran_tx, double tran_ty)
+        {
+            // update the scale of curve points
+            curve_end_pts.update_scale(d_scale, tran_tx, tran_ty);
+            curve_cntrl_pts.update_scale(d_scale, tran_tx, tran_ty);
+            curve_t_pts.update_scale(d_scale, tran_tx, tran_ty);
+            curve_as_tlines.update_scale(d_scale, tran_tx, tran_ty);
+        }
+
         public void set_openTK_objects()
         {
             // Set the discretized lines openTK 
@@ -72,7 +82,6 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             // Paint the curves
             // Set openTK becore calling this function
             this.curve_as_tlines.paint_all_lines();
-
         }
 
         public override bool Equals(object obj)

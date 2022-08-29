@@ -36,30 +36,6 @@ namespace _2DTriangle_Mesh_Generator.opentk_control.opentk_bgdraw
                   0.0f, +1.0f, 0.0f, 0.0f,1.0f ,1.0f // x = 0 line
             };
 
-        //        private readonly float[] _boundary_rect_vertices =
-        //{
-        //                 -0.25f, -0.25f, 0.0f, 1.0f , 0.0f, 1.0f,// -X,-Y
-        //                 +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, // +X,-Y
-        //                 +0.25f, +0.25f, 0.0f, 1.0f, 0.0f,1.0f,  // +X,+Y
-        //                 -0.5f, +0.5f, 0.0f, 1.0f, 0.0f, 1.0f, // -X,+Y
-        //                 -1.0f, 0.0f, 1.0f, 0.0f,0.0f ,1.0f, // y = 0 line
-        //                 +1.0f, 0.0f, 1.0f, 0.0f,0.0f ,1.0f, // y = 0 line
-        //                  0.0f, -1.0f, 0.0f, 0.0f,1.0f ,1.0f, // x = 0 line
-        //                  0.0f, +1.0f, 0.0f, 0.0f,1.0f ,1.0f // x = 0 line
-        //            };
-
-        //        private readonly float[] _boundary_rect_vertices =
-        //{
-        //                 -67.0f, -20.0f, 0.0f, 1.0f, 0.0f, 1.0f,// -X,-Y
-        //                 +33.0f, -20.0f, 0.0f, 1.0f, 0.0f, 1.0f, // +X,-Y
-        //                 +33.0f, +80.0f, 0.0f, 1.0f, 0.0f, 1.0f,  // +X,+Y
-        //                 -67.0f, +80.0f, 0.0f, 1.0f, 0.0f, 1.0f, // -X,+Y
-        //                 -1.0f, 0.0f, 1.0f, 0.0f,0.0f ,1.0f, // y = 0 line
-        //                 +1.0f, 0.0f, 1.0f, 0.0f,0.0f ,1.0f, // y = 0 line
-        //                  0.0f, -1.0f, 0.0f, 0.0f,1.0f ,1.0f, // x = 0 line
-        //                  0.0f, +1.0f, 0.0f, 0.0f,1.0f ,1.0f // x = 0 line
-        //                 };
-
 
         private readonly uint[] _boundary_rect_indices =
         {

@@ -21,18 +21,16 @@ namespace _2DTriangle_Mesh_Generator.opentk_control
     {
         // variable stores all the shader information
         private shader_control all_shaders = new shader_control();
+
         // variable to control the boundary rectangle
         private boundary_rectangle_store boundary_rect = new boundary_rectangle_store(false, null);
+
         // Shader variable
         // Boundary shader
         private Shader _br_shader;
-        // Drawing shader
-        private Shader _dr_shader;
 
         // Imported drawing scale
         public float _zoom_val { get; private set; }
-
-        private float _dr_d_scale = 1.0f;
 
         public opentk_main_control()
         {
@@ -45,11 +43,8 @@ namespace _2DTriangle_Mesh_Generator.opentk_control
                 ((float)clr_bg.A / 255.0f));
 
             // create the shaders
-            this._br_shader = new Shader(all_shaders.get_vertex_shader(shader_control.shader_type.br_shader),
-                 all_shaders.get_fragment_shader(shader_control.shader_type.br_shader));
-
-            this._dr_shader = new Shader(all_shaders.get_vertex_shader(shader_control.shader_type.br_shader),
-                 all_shaders.get_fragment_shader(shader_control.shader_type.br_shader));
+            this._br_shader = new Shader(all_shaders.get_vertex_shader(),
+                 all_shaders.get_fragment_shader());
 
             // create the boundary
             boundary_rect = new boundary_rectangle_store(true, this._br_shader);
@@ -68,24 +63,13 @@ namespace _2DTriangle_Mesh_Generator.opentk_control
         public void set_opengl_shader(int s_type)
         {
             // Bind the shader
-            if (s_type == 1)
-            {
                 _br_shader.Use();
-            }
-            else if (s_type == 2)
-            {
-                _dr_shader.Use();
-            }
         }
 
         public void update_drawing_area_size(int width, int height)
         {
             // update the drawing area size
             this._br_shader.update_shader.update_primary_scale(this._br_shader, width, height);
-            this._dr_shader.update_shader.update_primary_scale(this._dr_shader, width, height);
-
-            // Update the drawing scale and translation
-            update_drawing_scale_and_translation(this._dr_d_scale, 0.0f, 0.0f, false);
 
             // Update the graphics drawing area
             GL.Viewport(this._br_shader.update_shader.drawing_area_details.drawing_area_center_x,
@@ -95,42 +79,30 @@ namespace _2DTriangle_Mesh_Generator.opentk_control
 
         }
 
-        public void update_drawing_scale_and_translation(float d_scale, float t_trans_x, float t_trans_y, bool set_origin)
-        {
-            // Update the drawing size
-            this._dr_d_scale = d_scale;
-
-            this._dr_shader.update_shader.update_scale_and_orgintranslation(this._dr_shader, d_scale, t_trans_x, t_trans_y, set_origin);
-        }
-
         public void intelli_zoom_operation(double e_Delta, int e_X, int e_Y)
         {
             // Intelli zoom all the vertex shaders
-            this._br_shader.update_shader.intelli_zoom(this._br_shader, e_Delta, e_X, e_Y);
-            this._dr_shader.update_shader.intelli_zoom(this._dr_shader, e_Delta, e_X, e_Y);
 
-            this._zoom_val = this._dr_shader.update_shader._zm_scale;
+            this._br_shader.update_shader.intelli_zoom(this._br_shader, e_Delta, e_X, e_Y);
+            this._zoom_val = this._br_shader.update_shader._zm_scale;
         }
 
         public void pan_operation(float et_X, float et_Y)
         {
             // Pan the vertex shader
             this._br_shader.update_shader.pan_operation(this._br_shader, et_X, et_Y);
-            this._dr_shader.update_shader.pan_operation(this._dr_shader, et_X, et_Y);
         }
 
         public void pan_operation_complete()
         {
             // End the pan operation saving translate
             this._br_shader.update_shader.save_translate_transform();
-            this._dr_shader.update_shader.save_translate_transform();
         }
 
         public void zoom_to_fit(ref GLControl this_Gcntrl)
         {
             // Zoom to fit the vertex shader
             this._br_shader.update_shader.zoom_to_fit_operation(this._br_shader, ref this_Gcntrl);
-            this._dr_shader.update_shader.zoom_to_fit_operation(this._dr_shader, ref this_Gcntrl);
         }
     }
 }

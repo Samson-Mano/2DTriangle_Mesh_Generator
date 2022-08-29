@@ -17,9 +17,11 @@ namespace _2DTriangle_Mesh_Generator.opentk_control.shader_compiler
     public class Shader_Support
     {
         // scale to control the units of drawing area
-        private float _primary_scale = 1.0f;
+        private float _boundary_scale = 1.0f;
+
         // zoom scale
         public float _zm_scale = 1.0f;
+
         // Translation details
         private Vector3 _current_translation = new Vector3(0.0f, 0.0f, 0.0f);
         private Vector3 _previous_translation = new Vector3(0.0f, 0.0f, 0.0f);
@@ -39,8 +41,8 @@ namespace _2DTriangle_Mesh_Generator.opentk_control.shader_compiler
         private Shader this_shader;
         private System.Windows.Forms.Timer myTimer = new System.Windows.Forms.Timer();
 
-        //private readonly object zfitlock = new object();
-        private drawing_area_control _drawing_area_details = new drawing_area_control(500, 500);
+        private drawing_area_control _drawing_area_details = new drawing_area_control( 500, 500);
+
         public drawing_area_control drawing_area_details { get { return this._drawing_area_details; } }
 
         public Shader_Support()
@@ -58,31 +60,10 @@ namespace _2DTriangle_Mesh_Generator.opentk_control.shader_compiler
             this._drawing_area_details = new drawing_area_control(width, height);
 
             // Primary scale
-            this._primary_scale = this._drawing_area_details.norm_drawing_area_min;
+            this._boundary_scale = this._drawing_area_details.norm_drawing_area_min;
+            global_variables.gvariables_static.boundary_scale = this._boundary_scale;
 
             scale_Transform(1.0f);
-        }
-
-        public void update_scale_and_orgintranslation(Shader s_shader, float d_scale, float o_transl_x, float o_transl_y, bool set_orgin)
-        {
-            // Assign the shader
-            this_shader = s_shader;
-
-            // Primary scale
-            this._primary_scale = 1.0f * d_scale;
-
-            // Set orignial translation
-            if (set_orgin == true)
-            {
-                this._previous_translation.X = 0.0f;
-                this._previous_translation.Y = 0.0f;
-
-                // Save for the zoom_to_fit operation
-                this.origin_transl_x = o_transl_x;
-                this.origin_transl_y = o_transl_y;
-            }
-
-            scale_intelli_zoom_Transform(this._zm_scale, o_transl_x, o_transl_y);
         }
 
         public void intelli_zoom(Shader s_shader, double e_Delta, int e_X, int e_Y)
@@ -116,7 +97,6 @@ namespace _2DTriangle_Mesh_Generator.opentk_control.shader_compiler
 
             // Scale the view with intellizoom (translate and scale)
             scale_intelli_zoom_Transform(this._zm_scale, tx, ty);
-
         }
 
         public void pan_operation(Shader s_shader, float et_X, float et_Y)
@@ -185,7 +165,6 @@ namespace _2DTriangle_Mesh_Generator.opentk_control.shader_compiler
             }
         }
 
-
         private void scale_intelli_zoom_Transform(float zm, float tx, float ty)
         {
             //update the scale
@@ -201,15 +180,15 @@ namespace _2DTriangle_Mesh_Generator.opentk_control.shader_compiler
             this._zm_scale = zm;
 
             //update the scale
-            this_shader.SetFloat("gScale", this._zm_scale * this._primary_scale);
+            this_shader.SetFloat("gScale", this._zm_scale * this._boundary_scale);
         }
 
         private void translate_Transform(float trans_x, float trans_y)
         {
             // 2D Translatoin
-            _current_translation = new Vector3(trans_x + this._previous_translation.X,
-                trans_y + this._previous_translation.Y,
-                0.0f + this._previous_translation.Z);
+            _current_translation = new Vector3(trans_x  + this._previous_translation.X,
+                                                trans_y + this._previous_translation.Y,
+                                                    0.0f + this._previous_translation.Z);
 
             Matrix4 current_transformation = new Matrix4(1.0f, 0.0f, 0.0f, _current_translation.X,
                 0.0f, 1.0f, 0.0f, _current_translation.Y,
@@ -217,7 +196,6 @@ namespace _2DTriangle_Mesh_Generator.opentk_control.shader_compiler
                 0.0f, 0.0f, 0.0f, 1.0f);
 
             this_shader.SetMatrix4("gTranslation", current_transformation);
-            // update_the_drawing_scale();
         }
 
         public void save_translate_transform()
@@ -226,6 +204,5 @@ namespace _2DTriangle_Mesh_Generator.opentk_control.shader_compiler
             _previous_translation = _current_translation;
         }
         #endregion
-
     }
 }

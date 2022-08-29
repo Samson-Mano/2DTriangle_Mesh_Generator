@@ -20,9 +20,10 @@ namespace _2DTriangle_Mesh_Generator.txt_input_reader
         public HashSet<ellipse_store> all_ellipses { get; private set; }
 
         public float dr_scale { get; private set; }
+
         public float dr_tx { get; private set; }
+
         public float dr_ty { get; private set; }
-        public double ellipse_size_control { get; private set; }
 
         public txt_to_surface_conversion(txt_rd_reader t_txt_rd_rslt)
         {
@@ -75,19 +76,23 @@ namespace _2DTriangle_Mesh_Generator.txt_input_reader
                             min_y = Math.Min(min_y, pts.d_y);
                         }
                     }
-
                 }
 
                 // Scale Translation
                 double bound_x = Math.Abs(max_x - min_x);
                 double bound_y = Math.Abs(max_y - min_y);
 
-                this.dr_scale = (float)(1.0d / Math.Abs(Math.Max(bound_x, bound_y)));
+                this.dr_scale = (float)(1.8d / Math.Abs(Math.Max(bound_x, bound_y)));
 
                 // Translation values
-                this.dr_tx = (-0.5f * (float)(max_x + min_x)) * this.dr_scale;
-                this.dr_ty = (-0.5f * (float)(max_y + min_y)) * this.dr_scale;
+                this.dr_tx = (-0.5f * (float)(max_x + min_x));
+                this.dr_ty = (-0.5f * (float)(max_y + min_y)); 
 
+                // Update the scale of the surface
+                for ( int i = 0; i< this.all_surface.Count;i++)
+                {
+                    this.all_surface.ElementAt(i).update_scale(this.dr_scale, -this.dr_tx, -this.dr_ty);
+                }
 
                 // initialize the end points
                 this.all_ellipses = new HashSet<ellipse_store>();
@@ -106,14 +111,11 @@ namespace _2DTriangle_Mesh_Generator.txt_input_reader
                     double.TryParse(str_pt[1], out y_coord);
 
                     // Add to the surface list
-                    this.ellipse_size_control = Math.Abs(Math.Max(bound_x, bound_y));
-                    global_variables.gvariables_static.ellipse_size_control = this.ellipse_size_control;
-                    this.all_ellipses.Add(new ellipse_store(pts_id, x_coord, y_coord, Color.Brown, this.ellipse_size_control * 0.005));
+                    this.all_ellipses.Add(new ellipse_store(pts_id, x_coord, y_coord, this.dr_scale, -this.dr_tx, -this.dr_ty, Color.Brown));
                 }
 
             }
         }
-
 
         private closed_boundary_store find_the_closed_bndry_curves(int bndry_id, string str_bndry_curve_ids)
         {
@@ -164,7 +166,7 @@ namespace _2DTriangle_Mesh_Generator.txt_input_reader
                     }
 
                     // Flip ids based on the previous id
-                    if ((previous_end_pt_id != start_pt_id) && previous_end_pt_id !=-1)
+                    if ((previous_end_pt_id != start_pt_id) && previous_end_pt_id != -1)
                     {
                         int temp_id = start_pt_id;
                         start_pt_id = end_pt_id;
@@ -402,7 +404,6 @@ namespace _2DTriangle_Mesh_Generator.txt_input_reader
             return -1;
         }
 
-
         private point_store str_to_points(int pt_id, string str_ptdata)
         {
             // Points
@@ -416,6 +417,5 @@ namespace _2DTriangle_Mesh_Generator.txt_input_reader
             // Create point and return
             return new point_store(pt_id, x_coord, y_coord, gvariables_static.curve_color);
         }
-
     }
 }

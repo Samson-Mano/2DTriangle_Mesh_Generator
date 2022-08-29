@@ -20,18 +20,6 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
         public double y_centroid { get; private set; }
 
-        public double x_area_moment { get; private set; }
-
-        public double y_area_moment { get; private set; }
-
-        public double xy_area_moment { get; private set; }
-
-        public double area_moment_p1 { get; private set; }
-
-        public double area_moment_p2 { get; private set; }
-
-        public double area_moment_theta { get; private set; }
-
         public closed_boundary_store closed_outer_bndry { get; private set; }
 
         public HashSet<closed_boundary_store> closed_inner_bndries { get; private set; }
@@ -50,6 +38,19 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             set_surface_geometric_parameter();
         }
 
+        public void update_scale(double d_scale, double tran_tx, double tran_ty)
+        {
+            // called once when the surface is added
+            // update the outter boundary scale & trans tx, ty
+            this.closed_outer_bndry.update_scale(d_scale, tran_tx, tran_ty);
+
+            // update the inner boundary scale & trans tx, ty
+            for(int i = 0; i < this.closed_inner_bndries.Count;i++)
+            {
+                this.closed_inner_bndries.ElementAt(i).update_scale(d_scale, tran_tx, tran_ty);
+            }
+        }
+
         private void set_surface_geometric_parameter()
         {
             // https://leancrew.com/all-this/2018/01/greens-theorem-and-section-properties/
@@ -63,15 +64,6 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             // Centroid of outter boundary
             double x_center = this.closed_outer_bndry.centroid_x * outer_boundary_area;
             double y_center = this.closed_outer_bndry.centroid_y * outer_boundary_area;
-            // Second moment of area
-            double x_moi = this.closed_outer_bndry.moi_x;
-            double y_moi = this.closed_outer_bndry.moi_y;
-            double xy_moi = this.closed_outer_bndry.moi_xy;
-            // Principal moment of area
-            double moi_p1 = this.closed_outer_bndry.moi_P1;
-            double moi_p2 = this.closed_outer_bndry.moi_P2;
-            double moi_theta = this.closed_outer_bndry.moi_theta;
-
             // minimum x & y
             this.x_min = this.x_min> this.closed_outer_bndry.x_min? this.closed_outer_bndry.x_min : this.x_min;
             this.y_min = this.y_min > this.closed_outer_bndry.y_min ? this.closed_outer_bndry.y_min : this.y_min;
@@ -88,16 +80,6 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
                 inner_boundary_area = inner_boundary_area + ib_area;
 
-                // moment of inertia
-                x_moi = x_moi - inner_bndry.moi_x;
-                y_moi = y_moi - inner_bndry.moi_y;
-                xy_moi = xy_moi - inner_bndry.moi_xy;
-
-                // principal moment of inertia
-                moi_p1 = moi_p1 - inner_bndry.moi_P1;
-                moi_p2 = moi_p2 - inner_bndry.moi_P2;
-                moi_theta = moi_theta - inner_bndry.moi_theta;
-
                 // minimum x & y
                 this.x_min = this.x_min > inner_bndry.x_min ? inner_bndry.x_min : this.x_min;
                 this.y_min = this.y_min > inner_bndry.y_min ? inner_bndry.y_min : this.y_min;
@@ -107,16 +89,6 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             this.surf_area = (outer_boundary_area - inner_boundary_area);
             this.x_centroid = x_center / this.surf_area;
             this.y_centroid = y_center / this.surf_area;
-
-            //  Moment of inertia about the centroid
-            this.x_area_moment = x_moi;
-            this.y_area_moment = y_moi;
-            this.xy_area_moment = xy_moi;
-
-            // Principal moment of inertia
-            this.area_moment_p1 = moi_p1;
-            this.area_moment_p2 = moi_p2;
-            this.area_moment_theta = moi_theta;
         }
 
         public void set_openTK_objects()

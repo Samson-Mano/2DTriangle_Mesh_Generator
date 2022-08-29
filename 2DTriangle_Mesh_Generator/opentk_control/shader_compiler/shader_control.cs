@@ -6,14 +6,8 @@ using System.Threading.Tasks;
 
 namespace _2DTriangle_Mesh_Generator.opentk_control.shader_compiler
 {
-  public  class shader_control
+    public class shader_control
     {
-        public enum shader_type
-        {
-            br_shader,
-            dr_shader
-        }
-
         #region "Vertex Shaders"
         public string br_vert_shader()
         {
@@ -61,25 +55,21 @@ namespace _2DTriangle_Mesh_Generator.opentk_control.shader_compiler
             // Empty cconstructor
         }
 
-        public string get_vertex_shader(shader_type stype)
+        public string get_vertex_shader()
         {
             // Returns the vertex shader
             string vert_out = "";
-            if (stype == shader_type.br_shader)
-            {
-                vert_out = br_vert_shader();
-            }
+            vert_out = br_vert_shader();
+
             return vert_out;
         }
 
-        public string get_fragment_shader(shader_type stype)
+        public string get_fragment_shader()
         {
             // Returns the fragment shader
             string frag_out = "";
-            if (stype == shader_type.br_shader)
-            {
-                frag_out = br_frag_shader();
-            }
+            frag_out = br_frag_shader();
+
             return frag_out;
         }
     }

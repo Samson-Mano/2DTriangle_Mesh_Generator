@@ -115,5 +115,16 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             this.all_tri.Add(new triangle_store(t_tid, pt0, pt1, pt2));
         }
 
+
+        public void update_scale(double d_scale, double tran_tx, double tran_ty)
+        {
+            for (int i = 0;i<all_tri.Count;i++)
+            {
+                this.all_tri[i].update_scale(d_scale, tran_tx, tran_ty);
+            }
+
+            // triangle pts update
+            this.all_tri_pts.update_scale(d_scale, tran_tx, tran_ty);
+        }
     }
 }

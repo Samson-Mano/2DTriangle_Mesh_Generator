@@ -17,8 +17,7 @@ namespace _2DTriangle_Mesh_Generator.global_variables
         public static bool Is_cntrldown = false;
         public static Color curve_color = Color.BlueViolet;
 
-        // Ellipse size control
-        public static double ellipse_size_control = 1.0;
+        public static double boundary_scale = 1.0;
 
         public static int RoundOff(this int i)
         {

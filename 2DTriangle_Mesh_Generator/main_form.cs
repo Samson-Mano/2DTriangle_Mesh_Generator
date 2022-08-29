@@ -69,10 +69,8 @@ namespace _2DTriangle_Mesh_Generator
                 {
                     // Re-initialize the geometry
                     geom_obj = new geometry_store();
-                    geom_obj.add_geometry(surf_conv.all_surface, surf_conv.all_ellipses);
+                    geom_obj.add_geometry(surf_conv.all_surface, surf_conv.all_ellipses,surf_conv.dr_scale,surf_conv.dr_tx,surf_conv.dr_ty);
                     geom_obj.set_openTK_objects();
-
-                    g_control.update_drawing_scale_and_translation(surf_conv.dr_scale, surf_conv.dr_tx, surf_conv.dr_ty, true);
 
                     glControl_main_panel.Invalidate();
                 }
@@ -134,6 +132,8 @@ namespace _2DTriangle_Mesh_Generator
             // Update the size of the drawing area
             g_control.update_drawing_area_size(glControl_main_panel.Width,
                 glControl_main_panel.Height);
+
+            toolStripStatusLabel_zoom_value.Text = "Zoom: " + (gvariables_static.RoundOff((int)(1.0f * 100))).ToString() + "%";
 
             // Refresh the painting area
             glControl_main_panel.Invalidate();

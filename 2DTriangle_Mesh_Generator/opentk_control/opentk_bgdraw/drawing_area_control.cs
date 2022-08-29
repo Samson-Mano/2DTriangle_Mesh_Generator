@@ -31,7 +31,7 @@ namespace _2DTriangle_Mesh_Generator.opentk_control.opentk_bgdraw
 
         public float drawing_area_y_norm_max { get { return (float)this._drawing_area_height / (float)max_drawing_area_size; } } // Normalized canvas height (as seen in screen)
 
-        public drawing_area_control(int width, int height)
+        public drawing_area_control( int width, int height)
         {
             this._drawing_area_width = width;
             this._drawing_area_height = height;

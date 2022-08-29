@@ -114,6 +114,16 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             }
         }
 
+        public void update_scale(double d_scale, double tran_tx, double tran_ty)
+        {
+            // update the scale of curves
+            for(int i = 0; i < all_pts.Count; i++)
+            {
+                this.all_pts.ElementAt(i).update_scale(d_scale,tran_tx,tran_ty);
+            }
+
+        }
+
         public void add_point(point_store temp_pt)
         {
             // Check whether the point already exists
