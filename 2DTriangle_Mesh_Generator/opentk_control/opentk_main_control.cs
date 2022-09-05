@@ -29,6 +29,9 @@ namespace _2DTriangle_Mesh_Generator.opentk_control
         // Boundary shader
         private Shader _br_shader;
 
+        // Texture shader
+        private Shader _txt_shader;
+
         // Imported drawing scale
         public float _zoom_val { get; private set; }
 
@@ -43,8 +46,10 @@ namespace _2DTriangle_Mesh_Generator.opentk_control
                 ((float)clr_bg.A / 255.0f));
 
             // create the shaders
-            this._br_shader = new Shader(all_shaders.get_vertex_shader(),
-                 all_shaders.get_fragment_shader());
+            this._br_shader = new Shader(all_shaders.get_vertex_shader(0),
+                 all_shaders.get_fragment_shader(0));
+            this._txt_shader = new Shader(all_shaders.get_vertex_shader(1),
+                 all_shaders.get_fragment_shader(1));
 
             // create the boundary
             boundary_rect = new boundary_rectangle_store(true, this._br_shader);
@@ -63,13 +68,21 @@ namespace _2DTriangle_Mesh_Generator.opentk_control
         public void set_opengl_shader(int s_type)
         {
             // Bind the shader
+            if (s_type == 0)
+            {
                 _br_shader.Use();
+            }
+            else if (s_type == 1)
+            {
+                _txt_shader.Use();
+            }
         }
 
         public void update_drawing_area_size(int width, int height)
         {
             // update the drawing area size
             this._br_shader.update_shader.update_primary_scale(this._br_shader, width, height);
+            this._txt_shader.update_shader.update_primary_scale(this._txt_shader, width, height);
 
             // Update the graphics drawing area
             GL.Viewport(this._br_shader.update_shader.drawing_area_details.drawing_area_center_x,
@@ -82,8 +95,9 @@ namespace _2DTriangle_Mesh_Generator.opentk_control
         public void intelli_zoom_operation(double e_Delta, int e_X, int e_Y)
         {
             // Intelli zoom all the vertex shaders
-
             this._br_shader.update_shader.intelli_zoom(this._br_shader, e_Delta, e_X, e_Y);
+            this._txt_shader.update_shader.intelli_zoom(this._txt_shader, e_Delta, e_X, e_Y);
+
             this._zoom_val = this._br_shader.update_shader._zm_scale;
         }
 
@@ -91,18 +105,21 @@ namespace _2DTriangle_Mesh_Generator.opentk_control
         {
             // Pan the vertex shader
             this._br_shader.update_shader.pan_operation(this._br_shader, et_X, et_Y);
+            this._txt_shader.update_shader.pan_operation(this._txt_shader, et_X, et_Y);
         }
 
         public void pan_operation_complete()
         {
             // End the pan operation saving translate
             this._br_shader.update_shader.save_translate_transform();
+            this._txt_shader.update_shader.save_translate_transform();
         }
 
         public void zoom_to_fit(ref GLControl this_Gcntrl)
         {
             // Zoom to fit the vertex shader
             this._br_shader.update_shader.zoom_to_fit_operation(this._br_shader, ref this_Gcntrl);
+            this._txt_shader.update_shader.zoom_to_fit_operation(this._txt_shader, ref this_Gcntrl);
         }
     }
 }

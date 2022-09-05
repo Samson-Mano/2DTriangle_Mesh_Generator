@@ -91,6 +91,34 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             this.y_centroid = y_center / this.surf_area;
         }
 
+        public List<string> get_surface_data()
+        {
+            List<string> surface_data = new List<string>();
+
+            // Surface ID
+            surface_data.Add(surf_id.ToString());
+            //  // Surface ID, End pts ID, Boundary ID, Nested boundary ID, Surface meshed
+
+            // End PT IDs
+            surface_data.Add(this.closed_outer_bndry.str_end_pt_ids);
+
+            // Boundary IDs
+            surface_data.Add(this.closed_outer_bndry.str_boundary_curve_ids);
+
+            // Nested boundary ID
+            string inner_surf_boundarycurve_ids = "";
+            foreach (closed_boundary_store bndry in this.closed_inner_bndries)
+            {
+                inner_surf_boundarycurve_ids = inner_surf_boundarycurve_ids + "[" + bndry.str_boundary_curve_ids + "] ";
+            }
+            surface_data.Add(inner_surf_boundarycurve_ids);
+
+            // Surface meshed
+            surface_data.Add("false");
+
+            return surface_data;
+        }
+
         public void set_openTK_objects()
         {
             // Set the closed boundaries openTK 

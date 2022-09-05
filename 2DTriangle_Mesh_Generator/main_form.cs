@@ -30,6 +30,10 @@ namespace _2DTriangle_Mesh_Generator
         // glControl wrapper class
         private opentk_main_control g_control;
 
+        private bool is_model_loaded = false;
+
+        mesh_control.mesh_form mesh_form1;
+
         // Cursor point on the GLControl
         private PointF click_pt;
 
@@ -54,6 +58,7 @@ namespace _2DTriangle_Mesh_Generator
         private void importGeometryToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // Import Geometry
+            
             OpenFileDialog ow = new OpenFileDialog();
             ow.DefaultExt = "*.txt";
             ow.Filter = "Samson Mano's Varai2D raw data - txt Files (*.txt)|*.txt";
@@ -69,13 +74,32 @@ namespace _2DTriangle_Mesh_Generator
                 {
                     // Re-initialize the geometry
                     geom_obj = new geometry_store();
-                    geom_obj.add_geometry(surf_conv.all_surface, surf_conv.all_ellipses,surf_conv.dr_scale,surf_conv.dr_tx,surf_conv.dr_ty);
+                    geom_obj.add_geometry(surf_conv.all_surface, surf_conv.all_ellipses,surf_conv.all_labels,surf_conv.dr_scale,surf_conv.dr_tx,surf_conv.dr_ty);
                     geom_obj.set_openTK_objects();
+
+                    is_model_loaded = true;
 
                     glControl_main_panel.Invalidate();
                 }
             }
         }
+
+
+        private void createMeshToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Create mesh
+            if (is_model_loaded == true)
+            {
+                mesh_form1 = new mesh_control.mesh_form(geom_obj);
+                mesh_form1.ShowInTaskbar = false;
+                mesh_form1.StartPosition = FormStartPosition.CenterParent;
+                mesh_form1.Opacity = 0.9;
+
+                mesh_form1.ShowDialog();
+            }
+
+        }
+
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -108,14 +132,19 @@ namespace _2DTriangle_Mesh_Generator
             GL.BlendFunc(0, BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
             // Paint the background
-            g_control.set_opengl_shader(1);
+            g_control.set_opengl_shader(0);
             GL.LineWidth(1.0f);
             g_control.paint_opengl_control_background();
 
             // Display the model using OpenGL
-            g_control.set_opengl_shader(2);
-            GL.LineWidth(3.0f);
+            g_control.set_opengl_shader(0);
+            GL.LineWidth(2.437f);
             geom_obj.paint_geometry();
+
+            // Display the label
+            g_control.set_opengl_shader(1);
+            geom_obj.paint_label();
+
 
             // OpenTK windows are what's known as "double-buffered". In essence, the window manages two buffers.
             // One is rendered to while the other is currently displayed by the window.

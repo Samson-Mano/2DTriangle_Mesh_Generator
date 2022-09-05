@@ -13,6 +13,8 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store
 
         public HashSet<ellipse_store> all_endpoints { get; private set; }
 
+        public Label_list_store all_labels { get; private set; }
+
         public bool is_geometry_set { get; private set; }
 
         public geometry_store()
@@ -22,11 +24,13 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store
         }
 
 
-        public void add_geometry(HashSet<surface_store> t_all_surfaces, HashSet<ellipse_store> t_all_ellipses, double d_scale, double d_tx, double d_ty)
+        public void add_geometry(HashSet<surface_store> t_all_surfaces, HashSet<ellipse_store> t_all_ellipses,Label_list_store tlabel_list, double d_scale, double d_tx, double d_ty)
         {
             // Add all the surfaces
             this.all_surfaces = new HashSet<surface_store>(t_all_surfaces);
             this.all_endpoints = new HashSet<ellipse_store>(t_all_ellipses);
+            all_labels = new Label_list_store();
+            all_labels = tlabel_list;
         }
 
         public void set_openTK_objects()
@@ -42,6 +46,9 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store
             {
                 ellipse.set_openTK_objects();
             }
+
+            // Set the label data
+            all_labels.set_openTK_objects();
 
             this.is_geometry_set = true;
         }
@@ -60,6 +67,16 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store
                 {
                     ellipse.paint_ellipse();
                 }
+
+            }
+        }
+
+        public void paint_label()
+        {
+            if (this.is_geometry_set == true)
+            {
+                // Paint the labels for the geometry
+                all_labels.paint_labels();
             }
         }
     }

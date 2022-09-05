@@ -17,9 +17,13 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
     public class closed_boundary_store
     {
         public int closed_bndry_id { get; private set; }
-     
+
         public HashSet<curve_store> boundary_curves { get; private set; }
-      
+
+        public string str_boundary_curve_ids { get; private set; }
+
+        public string str_end_pt_ids { get; private set; }
+
         public HashSet<point_store> closed_bndry_pts { get; private set; }
 
         public double bndry_area { get; private set; }
@@ -40,8 +44,21 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
             // Add to closed boundary points (each curve is discretized to 100 pts)
             this.closed_bndry_pts = new HashSet<point_store>();
+            string str_curve_id = "";
+            string str_pt_id = "";
+
+            // Save the ids of the noundary end pts (for datagridview)
+            for (int i = 0; i < t_boundary_curves.Count; i++)
+            {
+                // set the pt ids to string (start pt id)
+                str_pt_id = str_pt_id + t_boundary_curves.ElementAt(i).curve_end_pts.all_pts.ElementAt(0).pt_id + ", ";
+            }
+
             foreach (curve_store curves in this.boundary_curves)
             {
+                // Set the id to string
+                str_curve_id = str_curve_id + curves.curve_id + ", ";
+
                 foreach (point_store pt in curves.curve_t_pts.all_pts)
                 {
                     int indx = this.closed_bndry_pts.Count - 1;
@@ -68,15 +85,16 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
                 }
             }
 
+            // remove the last comma from the string and add to the variable
+            this.str_boundary_curve_ids = str_curve_id.Substring(0,str_curve_id.Length - 2);
         }
-
 
         public void update_scale(double d_scale, double tran_tx, double tran_ty)
         {
             // update the curve scale
-            for(int i = 0;i< boundary_curves.Count; i++)
+            for (int i = 0; i < boundary_curves.Count; i++)
             {
-                this.boundary_curves.ElementAt(i).update_scale(d_scale, tran_tx, tran_ty); 
+                this.boundary_curves.ElementAt(i).update_scale(d_scale, tran_tx, tran_ty);
             }
         }
 

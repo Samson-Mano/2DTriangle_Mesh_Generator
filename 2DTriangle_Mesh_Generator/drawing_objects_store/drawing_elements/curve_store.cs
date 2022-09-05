@@ -61,6 +61,32 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             this.curve_t_pts = temp.Item2;
         }
 
+        public List<string> get_curve_data()
+        {
+            // get the curve data
+            List<string> curve_data = new List<string>();
+
+            // Curve ID
+            curve_data.Add(curve_id.ToString());
+
+            // Start PT
+            curve_data.Add(curve_end_pts.all_pts.ElementAt(0).pt_id.ToString());
+
+            // End PT
+            curve_data.Add(curve_end_pts.all_pts.ElementAt(1).pt_id.ToString());
+
+            // Element density
+            curve_data.Add("-100");
+
+
+            // Is element meshed
+            curve_data.Add("false");
+
+            // Element type
+            curve_data.Add(curve_type.ToString());
+
+            return curve_data;
+        }
 
         public void update_scale(double d_scale, double tran_tx, double tran_ty)
         {
@@ -70,6 +96,7 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             curve_t_pts.update_scale(d_scale, tran_tx, tran_ty);
             curve_as_tlines.update_scale(d_scale, tran_tx, tran_ty);
         }
+
 
         public void set_openTK_objects()
         {
