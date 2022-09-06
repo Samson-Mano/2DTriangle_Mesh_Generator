@@ -27,7 +27,6 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store
             this.is_geometry_set = false;
         }
 
-
         public void add_geometry(HashSet<surface_store> t_all_surfaces, HashSet<ellipse_store> t_all_ellipses,Label_list_store tlabel_list, double d_scale, double d_tx, double d_ty)
         {
             // Add all the surfaces
@@ -108,5 +107,44 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store
                 all_labels.paint_labels();
             }
         }
+
+
+        public void set_highlight_openTK_objects(int surf_id)
+        {
+            // Set the surfaces openTK 
+            foreach (surface_store surf in this.all_surfaces)
+            {
+                surf.set_openTK_objects();
+            }
+
+            foreach (surface_store surf in this.all_surfaces)
+            {
+                if (surf.surf_id == surf_id)
+                {
+                    surf.set_highlight_openTK_objects();
+                   return;
+                }
+            }
+        }
+
+        public void paint_highlight_surface(int surf_id)
+        {
+            // Highlight the selected surface
+            foreach (surface_store surf in this.all_surfaces)
+            {
+                if(surf.surf_id == surf_id)
+                {
+                    surf.paint_highlight_boundaries();
+                     return;
+                }
+            }
+        }
+
+        public void paint_highlight_edge(int edge_id)
+        {
+            // Highlight the selected edge
+
+        }
+
     }
 }

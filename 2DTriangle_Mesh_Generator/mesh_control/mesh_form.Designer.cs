@@ -28,6 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(mesh_form));
             this.button_mesh = new System.Windows.Forms.Button();
             this.button_delete = new System.Windows.Forms.Button();
@@ -93,6 +95,7 @@
             // 
             this.dataGridView_surface.AllowUserToAddRows = false;
             this.dataGridView_surface.AllowUserToDeleteRows = false;
+            this.dataGridView_surface.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.dataGridView_surface.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView_surface.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Column_surfaceID,
@@ -100,10 +103,18 @@
             this.Column_boundaryid,
             this.Column_nested,
             this.Column_meshexist});
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView_surface.DefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView_surface.Location = new System.Drawing.Point(12, 12);
             this.dataGridView_surface.Name = "dataGridView_surface";
             this.dataGridView_surface.ReadOnly = true;
-            this.dataGridView_surface.RowHeadersWidth = 51;
+            this.dataGridView_surface.RowHeadersWidth = 20;
             this.dataGridView_surface.RowTemplate.Height = 24;
             this.dataGridView_surface.Size = new System.Drawing.Size(439, 221);
             this.dataGridView_surface.TabIndex = 3;
@@ -131,6 +142,7 @@
             // 
             this.dataGridView_edge.AllowUserToAddRows = false;
             this.dataGridView_edge.AllowUserToDeleteRows = false;
+            this.dataGridView_edge.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.dataGridView_edge.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView_edge.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Column_edgeID,
@@ -139,10 +151,18 @@
             this.Column_elemdensity,
             this.Column_edgemeshed,
             this.Column_edgetype});
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView_edge.DefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView_edge.Location = new System.Drawing.Point(469, 13);
             this.dataGridView_edge.Name = "dataGridView_edge";
             this.dataGridView_edge.ReadOnly = true;
-            this.dataGridView_edge.RowHeadersWidth = 51;
+            this.dataGridView_edge.RowHeadersWidth = 20;
             this.dataGridView_edge.RowTemplate.Height = 24;
             this.dataGridView_edge.Size = new System.Drawing.Size(447, 220);
             this.dataGridView_edge.TabIndex = 6;
@@ -194,7 +214,7 @@
             this.Column_edgeID.MinimumWidth = 6;
             this.Column_edgeID.Name = "Column_edgeID";
             this.Column_edgeID.ReadOnly = true;
-            this.Column_edgeID.Width = 75;
+            this.Column_edgeID.Width = 50;
             // 
             // Column_startpt
             // 
@@ -202,7 +222,7 @@
             this.Column_startpt.MinimumWidth = 6;
             this.Column_startpt.Name = "Column_startpt";
             this.Column_startpt.ReadOnly = true;
-            this.Column_startpt.Width = 75;
+            this.Column_startpt.Width = 50;
             // 
             // Column_endID
             // 
@@ -210,7 +230,7 @@
             this.Column_endID.MinimumWidth = 6;
             this.Column_endID.Name = "Column_endID";
             this.Column_endID.ReadOnly = true;
-            this.Column_endID.Width = 75;
+            this.Column_endID.Width = 50;
             // 
             // Column_elemdensity
             // 
@@ -234,7 +254,6 @@
             this.Column_edgetype.MinimumWidth = 6;
             this.Column_edgetype.Name = "Column_edgetype";
             this.Column_edgetype.ReadOnly = true;
-            this.Column_edgetype.Width = 125;
             // 
             // Column_surfaceID
             // 
@@ -271,7 +290,7 @@
             this.Column_meshexist.MinimumWidth = 6;
             this.Column_meshexist.Name = "Column_meshexist";
             this.Column_meshexist.ReadOnly = true;
-            this.Column_meshexist.Width = 75;
+            this.Column_meshexist.Width = 50;
             // 
             // mesh_form
             // 
@@ -295,6 +314,7 @@
             this.MinimumSize = new System.Drawing.Size(946, 415);
             this.Name = "mesh_form";
             this.Text = "Mesh control";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.mesh_form_FormClosing);
             this.Load += new System.EventHandler(this.mesh_form_Load);
             this.SizeChanged += new System.EventHandler(this.mesh_form_SizeChanged);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_surface)).EndInit();

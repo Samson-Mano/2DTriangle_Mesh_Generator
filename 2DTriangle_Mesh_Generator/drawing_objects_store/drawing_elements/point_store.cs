@@ -13,6 +13,7 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
         private int _x;
         private int _y;
         private Color _pt_clr = Color.Red;
+        private Color _highlight_pt_clr = Color.Red;
 
         private double pt_paint_x;
         private double pt_paint_y;
@@ -47,6 +48,19 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             return vertex_clr;
         }
 
+        private float[] get_highlight_vertex_color()
+        {
+            float[] vertex_clr = new float[4];
+
+            // Add vertex color to the list
+            vertex_clr[0] = ((float)this._highlight_pt_clr.R / 255.0f);
+            vertex_clr[1] = ((float)this._highlight_pt_clr.G / 255.0f);
+            vertex_clr[2] = ((float)this._highlight_pt_clr.B / 255.0f);
+            vertex_clr[3] = ((float)this._highlight_pt_clr.A / 255.0f);
+
+            return vertex_clr;
+        }
+
         public void update_scale(double d_scale, double tran_tx, double tran_ty)
         {
             this.pt_paint_x = (d_x - tran_tx) * d_scale;
@@ -57,6 +71,12 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
         {
             // Return the point in openGL format
             return get_vertex_coords().Concat(get_vertex_color()).ToArray(); ;
+        }
+
+        public float[] get_highlight_point_vertices()
+        {
+            // Return the point in openGL format
+            return get_vertex_coords().Concat(get_highlight_vertex_color()).ToArray(); ;
         }
 
         public point_store(int t_pt_id, double t_x, double t_y, Color clr)

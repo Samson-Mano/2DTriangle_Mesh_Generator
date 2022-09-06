@@ -14,14 +14,20 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
 {
     public partial class mesh_form : Form
     {
+        private main_form parent_form;
         private geometry_store geom;
 
-        public mesh_form(geometry_store main_geom)
+        public int selected_surf_id { get; private set; }
+
+        public int selected_edge_id { get; private set; }
+
+        public mesh_form(geometry_store main_geom,main_form t_parent_form)
         {
             InitializeComponent();
             form_size_control();
 
             this.geom = main_geom;
+            this.parent_form = t_parent_form;
 
             // Fill the surface
             foreach (surface_store surf in main_geom.all_surfaces)
@@ -113,6 +119,9 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                 {
                     if(surf_id == surf.surf_id)
                     {
+                        this.selected_surf_id = surf_id;
+                        this.parent_form.highlight_selected_surface(surf_id);
+
                         dataGridView_edge.Rows.Clear();
                         // Fill the edges from the selected surfaces
                         // Outter boundary
@@ -131,6 +140,8 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                                 fill_edge_datagridview(curves.get_curve_data());
                             }
                         }
+
+                        return;
                     }
                     surf_index++;
                 }
@@ -157,6 +168,12 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
         private void button_keep_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void mesh_form_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            this.parent_form.highlight_selected_surface(-1);
+            this.parent_form.is_mesh_form_open = false;
         }
     }
 }

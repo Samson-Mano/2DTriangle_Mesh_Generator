@@ -57,6 +57,8 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
                 // set the pt ids to string (start pt id)
                 str_pt_id = str_pt_id + t_boundary_curves.ElementAt(i).curve_end_pts.all_pts.ElementAt(0).pt_id + ", ";
             }
+            this.str_end_pt_ids = str_pt_id.Substring(0, str_pt_id.Length - 2);
+
 
             foreach (curve_store curves in this.boundary_curves)
             {
@@ -108,6 +110,15 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             foreach (curve_store bndry_curve in this.boundary_curves)
             {
                 bndry_curve.set_openTK_objects();
+            }
+        }
+
+        public void set_highlight_openTK_objects()
+        {
+            // Set the curves associated with boundaries openTK 
+            foreach (curve_store bndry_curve in this.boundary_curves)
+            {
+                bndry_curve.set_highlight_openTK_objects();
             }
         }
 
@@ -207,6 +218,16 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             foreach (curve_store bndry_curve in this.boundary_curves)
             {
                 bndry_curve.paint_curve();
+            }
+        }
+
+        public void paint_highlight_closed_boundary()
+        {
+            // Paint the curves
+            // Set openTK becore calling this function
+            foreach (curve_store bndry_curve in this.boundary_curves)
+            {
+                bndry_curve.paint_highlight_curve();
             }
         }
     }

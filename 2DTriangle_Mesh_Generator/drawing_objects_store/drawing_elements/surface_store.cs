@@ -49,7 +49,7 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             this.closed_outer_bndry.update_scale(d_scale, tran_tx, tran_ty);
 
             // update the inner boundary scale & trans tx, ty
-            for(int i = 0; i < this.closed_inner_bndries.Count;i++)
+            for (int i = 0; i < this.closed_inner_bndries.Count; i++)
             {
                 this.closed_inner_bndries.ElementAt(i).update_scale(d_scale, tran_tx, tran_ty);
             }
@@ -75,9 +75,9 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             this.y_max = Double.MinValue;
 
             // maximum, minimum x & y
-            this.x_min = this.x_min> this.closed_outer_bndry.x_min? this.closed_outer_bndry.x_min : this.x_min;
-            this.x_max = this.x_max< this.closed_outer_bndry.x_max ? this.closed_outer_bndry.x_max : this.x_max;
-            this.y_min = this.y_min> this.closed_outer_bndry.y_min ? this.closed_outer_bndry.y_min : this.y_min;
+            this.x_min = this.x_min > this.closed_outer_bndry.x_min ? this.closed_outer_bndry.x_min : this.x_min;
+            this.x_max = this.x_max < this.closed_outer_bndry.x_max ? this.closed_outer_bndry.x_max : this.x_max;
+            this.y_min = this.y_min > this.closed_outer_bndry.y_min ? this.closed_outer_bndry.y_min : this.y_min;
             this.y_max = this.y_max < this.closed_outer_bndry.y_max ? this.closed_outer_bndry.y_max : this.y_max;
 
             double inner_boundary_area = 0.0;
@@ -155,5 +155,29 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
                 inner_bndry.paint_closed_boundary();
             }
         }
+
+        public void set_highlight_openTK_objects()
+        {
+            // Set the closed boundaries openTK 
+            this.closed_outer_bndry.set_highlight_openTK_objects();
+
+            foreach (closed_boundary_store inner_bndry in this.closed_inner_bndries)
+            {
+                inner_bndry.set_highlight_openTK_objects();
+            }
+        }
+
+        public void paint_highlight_boundaries()
+        {
+            // Paint the boundaries (outer and inner)
+            // Set openTK becore calling this function
+            this.closed_outer_bndry.paint_highlight_closed_boundary();
+
+            foreach (closed_boundary_store inner_bndry in this.closed_inner_bndries)
+            {
+                inner_bndry.paint_highlight_closed_boundary();
+            }
+        }
+
     }
 }

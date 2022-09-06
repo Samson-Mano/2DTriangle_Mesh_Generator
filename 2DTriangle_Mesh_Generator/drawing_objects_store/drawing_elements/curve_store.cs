@@ -104,11 +104,25 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             this.curve_as_tlines.set_openTK_objects();
         }
 
+
+        public void set_highlight_openTK_objects()
+        {
+            // Set the discretized lines openTK 
+            this.curve_as_tlines.set_highlight_openTK_objects();
+        }
+
         public void paint_curve()
         {
             // Paint the curves
             // Set openTK becore calling this function
             this.curve_as_tlines.paint_all_lines();
+        }
+
+        public void paint_highlight_curve()
+        {
+            // Paint the highlight curves
+            // Set openTK becore calling this function
+            this.curve_as_tlines.paint_all_highlight_lines();
         }
 
         public override bool Equals(object obj)

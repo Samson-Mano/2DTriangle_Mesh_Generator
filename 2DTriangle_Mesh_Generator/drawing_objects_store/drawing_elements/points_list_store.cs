@@ -83,6 +83,52 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             point_ElementBufferObject.Bind();
         }
 
+        public void set_highlight_openTK_objects()
+        {
+            // Set the openTK objects for the points
+            // Set the vertices
+            this._point_vertices = new float[7 * all_pts.Count];
+            this._point_indices = new uint[all_pts.Count];
+
+            foreach (point_store pts in all_pts)
+            {
+                // add the point vertices
+                float[] temp_vertices = pts.get_highlight_point_vertices();
+
+                int i = pts.pt_id;
+                // X, Y, Z Co-ordinate
+                this._point_vertices[(i * 7) + 0] = temp_vertices[0];
+                this._point_vertices[(i * 7) + 1] = temp_vertices[1];
+                this._point_vertices[(i * 7) + 2] = temp_vertices[2];
+
+                // R, G, B, A values
+                this._point_vertices[(i * 7) + 3] = temp_vertices[3];
+                this._point_vertices[(i * 7) + 4] = temp_vertices[4];
+                this._point_vertices[(i * 7) + 5] = temp_vertices[5];
+                this._point_vertices[(i * 7) + 6] = temp_vertices[6];
+
+                // Add the point indices
+                this._point_indices[i] = (uint)i;
+                i++;
+            }
+
+            //1.  Set up vertex buffer
+            point_VertexBufferObject = new VertexBuffer(this._point_vertices, this._point_vertices.Length * sizeof(float));
+
+            //2. Create and add to the buffer layout
+            point_BufferLayout = new List<VertexBufferLayout>();
+            point_BufferLayout.Add(new VertexBufferLayout(3, 7)); // Vertex layout
+            point_BufferLayout.Add(new VertexBufferLayout(4, 7)); // Color layout  
+
+            //3. Setup the vertex Array (Add vertexBuffer binds both the vertexbuffer and vertexarray)
+            point_VertexArrayObject = new VertexArray();
+            point_VertexArrayObject.Add_vertexBuffer(point_VertexBufferObject, point_BufferLayout);
+
+            // 4. Set up element buffer
+            point_ElementBufferObject = new IndexBuffer(this._point_indices, this._point_indices.Length);
+            point_ElementBufferObject.Bind();
+        }
+
         public void paint_all_points()
         {
             // Call set_openTK_objects()

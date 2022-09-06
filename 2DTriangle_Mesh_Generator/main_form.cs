@@ -31,6 +31,7 @@ namespace _2DTriangle_Mesh_Generator
         private opentk_main_control g_control;
 
         private bool is_model_loaded = false;
+        public bool is_mesh_form_open = false;
 
         mesh_control.mesh_form mesh_form1;
 
@@ -98,16 +99,31 @@ namespace _2DTriangle_Mesh_Generator
             // Create mesh
             if (is_model_loaded == true)
             {
-                mesh_form1 = new mesh_control.mesh_form(geom_obj);
+                mesh_form1 = new mesh_control.mesh_form(geom_obj,this);
                 mesh_form1.ShowInTaskbar = false;
                 mesh_form1.StartPosition = FormStartPosition.CenterParent;
                 mesh_form1.Opacity = 0.9;
 
+                this.is_mesh_form_open = true;
                 mesh_form1.ShowDialog();
             }
 
         }
 
+        public void highlight_selected_surface(int surf_id)
+        {
+            // Surface selection changed from mesh form
+            geom_obj.set_highlight_openTK_objects(surf_id);
+
+            // Refresh the controller
+            glControl_main_panel.Invalidate();
+        }
+
+        public void highlight_selected_edge(int edge_id)
+        {
+            // Edge selection changed from mesh form
+          //  geom_obj.paint_highlight_edge(edge_id);
+        }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -150,6 +166,15 @@ namespace _2DTriangle_Mesh_Generator
             // Display the label
             g_control.set_opengl_shader(1);
             geom_obj.paint_label();
+
+            if (is_mesh_form_open == true)
+            {
+                g_control.set_opengl_shader(0);
+
+                GL.LineWidth(3.30f);
+                // Surface selection changed from mesh form
+                geom_obj.paint_highlight_surface(mesh_form1.selected_surf_id);
+            }
 
 
             // OpenTK windows are what's known as "double-buffered". In essence, the window manages two buffers.
