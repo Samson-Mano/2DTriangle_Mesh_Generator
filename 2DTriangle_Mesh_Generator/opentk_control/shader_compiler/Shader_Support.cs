@@ -41,7 +41,7 @@ namespace _2DTriangle_Mesh_Generator.opentk_control.shader_compiler
         private Shader this_shader;
         private System.Windows.Forms.Timer myTimer = new System.Windows.Forms.Timer();
 
-        private drawing_area_control _drawing_area_details = new drawing_area_control( 500, 500);
+        private drawing_area_control _drawing_area_details = new drawing_area_control( 500, 500,0,0);
 
         public drawing_area_control drawing_area_details { get { return this._drawing_area_details; } }
 
@@ -51,16 +51,16 @@ namespace _2DTriangle_Mesh_Generator.opentk_control.shader_compiler
         }
 
         #region "Zoom and Pan operation of openGL control"
-        public void update_primary_scale(Shader s_shader, int width, int height)
+        public void update_primary_scale(Shader s_shader, int width, int height,double bound_x, double bound_y)
         {
             // Assign the shader
             this_shader = s_shader;
 
             // Update the drawing area
-            this._drawing_area_details = new drawing_area_control(width, height);
+            this._drawing_area_details = new drawing_area_control(width, height,bound_x,bound_y);
 
             // Primary scale
-            this._boundary_scale = this._drawing_area_details.norm_drawing_area_min;
+            this._boundary_scale = this._drawing_area_details.bound_scale;
             global_variables.gvariables_static.boundary_scale = this._boundary_scale;
 
             scale_Transform(1.0f);

@@ -16,6 +16,10 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
         public double y_min { get; private set; }
 
+        public double x_max { get; private set; }
+
+        public double y_max { get; private set; }
+
         public double x_centroid { get; private set; }
 
         public double y_centroid { get; private set; }
@@ -64,9 +68,17 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             // Centroid of outter boundary
             double x_center = this.closed_outer_bndry.centroid_x * outer_boundary_area;
             double y_center = this.closed_outer_bndry.centroid_y * outer_boundary_area;
-            // minimum x & y
+
+            this.x_min = Double.MaxValue;
+            this.x_max = Double.MinValue;
+            this.y_min = Double.MaxValue;
+            this.y_max = Double.MinValue;
+
+            // maximum, minimum x & y
             this.x_min = this.x_min> this.closed_outer_bndry.x_min? this.closed_outer_bndry.x_min : this.x_min;
-            this.y_min = this.y_min > this.closed_outer_bndry.y_min ? this.closed_outer_bndry.y_min : this.y_min;
+            this.x_max = this.x_max< this.closed_outer_bndry.x_max ? this.closed_outer_bndry.x_max : this.x_max;
+            this.y_min = this.y_min> this.closed_outer_bndry.y_min ? this.closed_outer_bndry.y_min : this.y_min;
+            this.y_max = this.y_max < this.closed_outer_bndry.y_max ? this.closed_outer_bndry.y_max : this.y_max;
 
             double inner_boundary_area = 0.0;
 
@@ -80,9 +92,11 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
                 inner_boundary_area = inner_boundary_area + ib_area;
 
-                // minimum x & y
+                // maximum, minimum x & y (No need exactly because inner boundary doesnot for extremities)
                 this.x_min = this.x_min > inner_bndry.x_min ? inner_bndry.x_min : this.x_min;
+                this.x_max = this.x_max < inner_bndry.x_max ? inner_bndry.x_max : this.x_max;
                 this.y_min = this.y_min > inner_bndry.y_min ? inner_bndry.y_min : this.y_min;
+                this.y_max = this.y_max < inner_bndry.y_max ? inner_bndry.y_max : this.y_max;
             }
 
             // save the geometric parameters

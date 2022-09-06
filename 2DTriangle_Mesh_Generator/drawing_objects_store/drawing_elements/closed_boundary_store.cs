@@ -34,7 +34,11 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
         public double x_min { get; private set; }
 
+        public double x_max { get; private set; }
+
         public double y_min { get; private set; }
+
+        public double y_max { get; private set; }
 
         public closed_boundary_store(int t_closed_bndry_id, HashSet<curve_store> t_boundary_curves)
         {
@@ -118,8 +122,11 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
             double x_i, x_ip1;
             double y_i, y_ip1;
+
             this.x_min = Double.MaxValue;
+            this.x_max = Double.MinValue;
             this.y_min = Double.MaxValue;
+            this.y_max = Double.MinValue;
 
             for (int i = 0; i < n - 1; i++)
             {
@@ -129,9 +136,11 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
                 x_ip1 = closed_bndry_pts.ElementAt(i + 1).d_x;
                 y_ip1 = closed_bndry_pts.ElementAt(i + 1).d_y;
 
-                // save the min of x & y
+                // save the min & max of x & y
                 this.x_min = this.x_min > x_i ? x_i : this.x_min;
+                this.x_max = this.x_max < x_i ? x_i : this.x_max;
                 this.y_min = this.y_min > y_i ? y_i : this.y_min;
+                this.y_max = this.y_max < y_i ? y_i : this.y_max;
 
                 // Calculate area
                 c_area = c_area + ((x_i * y_ip1) - (x_ip1 * y_i));
@@ -146,7 +155,9 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
             // save the min of x & y
             this.x_min = this.x_min > x_i ? x_i : this.x_min;
+            this.x_max = this.x_max < x_i ? x_i : this.x_max;
             this.y_min = this.y_min > y_i ? y_i : this.y_min;
+            this.y_max = this.y_max < y_i ? y_i : this.y_max;
 
             this.bndry_area = (c_area + ((x_i * y_ip1) - (x_ip1 * y_i))) / 2.0;
 

@@ -17,6 +17,10 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store
 
         public bool is_geometry_set { get; private set; }
 
+        public double geom_bound_width { get; private set; }
+
+        public double geom_bound_height { get; private set; }
+
         public geometry_store()
         {
             // Empty constructor
@@ -31,6 +35,31 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store
             this.all_endpoints = new HashSet<ellipse_store>(t_all_ellipses);
             all_labels = new Label_list_store();
             all_labels = tlabel_list;
+
+            // Fit the boundary
+            fit_the_boundary();
+        }
+
+        private void fit_the_boundary()
+        {
+            double x_min,x_max,y_min,y_max;
+
+            x_min = Double.MaxValue;
+            x_max = Double.MinValue;
+            y_min = Double.MaxValue;
+            y_max = Double.MinValue;
+
+            foreach (surface_store surf in this.all_surfaces)
+            {
+                x_min = x_min > surf.x_min ? surf.x_min : x_min;
+                x_max = x_max < surf.x_max ? surf.x_max : x_max;
+                y_min = y_min > surf.y_min ? surf.y_min : y_min;
+                y_max = y_max < surf.y_max ? surf.y_max : y_max;
+            }
+
+            this.geom_bound_width = x_max - x_min;
+            this.geom_bound_height = y_max - y_min;
+
         }
 
         public void set_openTK_objects()

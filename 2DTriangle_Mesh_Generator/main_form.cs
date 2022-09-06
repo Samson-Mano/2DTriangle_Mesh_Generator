@@ -79,6 +79,14 @@ namespace _2DTriangle_Mesh_Generator
 
                     is_model_loaded = true;
 
+                    // Update the size of the drawing area
+                    g_control.update_drawing_area_size(glControl_main_panel.Width,
+                        glControl_main_panel.Height, geom_obj.geom_bound_width, geom_obj.geom_bound_height);
+                    // (Ctrl + F) --> Zoom to fit
+                    g_control.zoom_to_fit(ref glControl_main_panel);
+
+                    toolStripStatusLabel_zoom_value.Text = "Zoom: " + (gvariables_static.RoundOff((int)(1.0f * 100))).ToString() + "%";
+
                     glControl_main_panel.Invalidate();
                 }
             }
@@ -116,7 +124,7 @@ namespace _2DTriangle_Mesh_Generator
 
             // Update the size of the drawing area
             g_control.update_drawing_area_size(glControl_main_panel.Width,
-                glControl_main_panel.Height);
+                glControl_main_panel.Height,2.0,2.0);
 
             // Refresh the controller (doesnt do much.. nothing to draw)
             glControl_main_panel.Invalidate();
@@ -131,13 +139,11 @@ namespace _2DTriangle_Mesh_Generator
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(0, BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
-            // Paint the background
+            // Paint the background color
             g_control.set_opengl_shader(0);
-            GL.LineWidth(1.0f);
             g_control.paint_opengl_control_background();
 
             // Display the model using OpenGL
-            g_control.set_opengl_shader(0);
             GL.LineWidth(2.437f);
             geom_obj.paint_geometry();
 
@@ -160,7 +166,7 @@ namespace _2DTriangle_Mesh_Generator
             // glControl size changed
             // Update the size of the drawing area
             g_control.update_drawing_area_size(glControl_main_panel.Width,
-                glControl_main_panel.Height);
+                glControl_main_panel.Height, geom_obj.geom_bound_width, geom_obj.geom_bound_height);
 
             toolStripStatusLabel_zoom_value.Text = "Zoom: " + (gvariables_static.RoundOff((int)(1.0f * 100))).ToString() + "%";
 

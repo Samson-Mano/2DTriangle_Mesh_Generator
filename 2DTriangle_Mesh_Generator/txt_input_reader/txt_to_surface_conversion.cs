@@ -27,6 +27,10 @@ namespace _2DTriangle_Mesh_Generator.txt_input_reader
 
         public float dr_ty { get; private set; }
 
+        public double bound_width { get; private set; }
+
+        public double bound_height { get; private set; }
+
         public txt_to_surface_conversion(txt_rd_reader t_txt_rd_rslt)
         {
             this.txt_rd_rslt = t_txt_rd_rslt;
@@ -84,7 +88,11 @@ namespace _2DTriangle_Mesh_Generator.txt_input_reader
                 double bound_x = Math.Abs(max_x - min_x);
                 double bound_y = Math.Abs(max_y - min_y);
 
-                this.dr_scale = (float)(1.8d / Math.Abs(Math.Max(bound_x, bound_y)));
+                this.dr_scale = (float)(1.8d / Math.Abs(Math.Min(bound_x, bound_y)));
+
+                // Save the bounds
+                this.bound_width = bound_x;
+                this.bound_height = bound_y;
 
                 // Translation values
                 this.dr_tx = (-0.5f * (float)(max_x + min_x));

@@ -23,7 +23,7 @@ namespace _2DTriangle_Mesh_Generator.opentk_control
         private shader_control all_shaders = new shader_control();
 
         // variable to control the boundary rectangle
-        private boundary_rectangle_store boundary_rect = new boundary_rectangle_store(false, null);
+       // private boundary_rectangle_store boundary_rect = new boundary_rectangle_store(false, null);
 
         // Shader variable
         // Boundary shader
@@ -51,8 +51,6 @@ namespace _2DTriangle_Mesh_Generator.opentk_control
             this._txt_shader = new Shader(all_shaders.get_vertex_shader(1),
                  all_shaders.get_fragment_shader(1));
 
-            // create the boundary
-            boundary_rect = new boundary_rectangle_store(true, this._br_shader);
         }
 
         public void paint_opengl_control_background()
@@ -61,8 +59,6 @@ namespace _2DTriangle_Mesh_Generator.opentk_control
             // Vertex Buffer (Buffer memory in GPU VRAM)
             // Shader (program which runs on GPU to paint in the screen)
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            // paint the boundary border
-            boundary_rect.paint_boundary_rectangle();
         }
 
         public void set_opengl_shader(int s_type)
@@ -78,11 +74,11 @@ namespace _2DTriangle_Mesh_Generator.opentk_control
             }
         }
 
-        public void update_drawing_area_size(int width, int height)
+        public void update_drawing_area_size(int width, int height,double bound_x, double bound_y)
         {
             // update the drawing area size
-            this._br_shader.update_shader.update_primary_scale(this._br_shader, width, height);
-            this._txt_shader.update_shader.update_primary_scale(this._txt_shader, width, height);
+            this._br_shader.update_shader.update_primary_scale(this._br_shader, width, height,bound_x,bound_y);
+            this._txt_shader.update_shader.update_primary_scale(this._txt_shader, width, height,bound_x,bound_y);
 
             // Update the graphics drawing area
             GL.Viewport(this._br_shader.update_shader.drawing_area_details.drawing_area_center_x,

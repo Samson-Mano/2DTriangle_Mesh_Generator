@@ -92,7 +92,6 @@
     <Compile Include="mesh_control\mesh_form.Designer.cs">
       <DependentUpon>mesh_form.cs</DependentUpon>
     </Compile>
-    <Compile Include="opentk_control\opentk_bgdraw\boundary_rectangle_store.cs" />
     <Compile Include="opentk_control\opentk_bgdraw\drawing_area_control.cs" />
     <Compile Include="opentk_control\opentk_buffer\IndexBuffer.cs" />
     <Compile Include="opentk_control\opentk_buffer\VertexArray.cs" />

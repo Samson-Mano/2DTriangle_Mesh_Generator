@@ -139,58 +139,6 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
         public Color _label_clr;
 
-        //private float[] get_label_vertex_coords()
-        //{
-        //    float[] vertex_coord = new float[24];
-        //    // Add vertex to list
-        //    vertex_coord[0] = (float)pt_paint_x;
-        //    vertex_coord[1] = (float)pt_paint_y - font_size;
-        //    // Texture coordinate (bottom left) 
-        //    vertex_coord[2] = 0.0f;
-        //    vertex_coord[3] = 0.0f;
-
-        //    vertex_coord[4] = (float)pt_paint_x;
-        //    vertex_coord[5] = (float)pt_paint_y;
-        //    // Texture coordinate (bottom right) 
-        //    vertex_coord[6] = 0.0f;
-        //    vertex_coord[7] = 1.0f;
-
-        //    vertex_coord[8] = (float)pt_paint_x + font_size;
-        //    vertex_coord[9] = (float)pt_paint_y;
-        //    // Texture coordinate (Top right) 
-        //    vertex_coord[10] = 1.0f;
-        //    vertex_coord[11] = 1.0f;
-
-        //    ///////////////////////////////////////////
-        //    vertex_coord[12] = (float)pt_paint_x;
-        //    vertex_coord[13] = (float)pt_paint_y - font_size;
-        //    // Texture coordinate (bottom left)  
-        //    vertex_coord[14] = 0.0f;
-        //    vertex_coord[15] = 0.0f;
-
-        //    vertex_coord[16] = (float)pt_paint_x + font_size;
-        //    vertex_coord[17] = (float)pt_paint_y;
-        //    // Texture coordinate (bottom left)  
-        //    vertex_coord[18] = 1.0f;
-        //    vertex_coord[19] = 1.0f;
-
-        //    vertex_coord[20] = (float)pt_paint_x + font_size;
-        //    vertex_coord[21] = (float)pt_paint_y - font_size;
-        //    // Texture coordinate (bottom left)  
-        //    vertex_coord[22] = 1.0f;
-        //    vertex_coord[23] = 0.0f;
-
-        //    return vertex_coord;
-        //}
-
-        //public float[] get_label_vertices()
-        //{
-        //    // Return the point in openGL format
-        //    // return get_label_vertex_coords().Concat(get_label_vertex_color()).ToArray(); ;
-        //    return get_label_vertex_coords();
-        //}
-
-
         public Label_data(int tlabel_id, string tlabel, double tl_x, double tl_y, double d_scale, double tran_tx, double tran_ty, Color tlabel_clr)
         {
             label_id = tlabel_id;
