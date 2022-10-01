@@ -11,6 +11,8 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
     {
         public int curve_id { get; private set; }
 
+        public double curve_length { get; private set; }
+
         public points_list_store curve_end_pts { get; private set; }
 
         public points_list_store curve_cntrl_pts { get; private set; }
@@ -59,6 +61,65 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             // Add all the lines and points to the list
             this.curve_as_tlines = temp.Item1;
             this.curve_t_pts = temp.Item2;
+
+            // Add curve length
+            this.curve_length = get_c_length();
+        }
+
+        public double get_c_length()
+        {
+            double c_length = 0.0;
+
+            if (curve_type == curve_types_enum.line)
+            {
+                // Line
+                point_store s_pt = curve_end_pts.all_pts.ElementAt(0);
+                point_store e_pt = curve_end_pts.all_pts.ElementAt(1);
+
+                c_length = (Math.Sqrt(Math.Pow((s_pt.d_x - e_pt.d_x), 2) + Math.Pow((s_pt.d_y - e_pt.d_y), 2)));
+            }
+            else if (curve_type == curve_types_enum.arc)
+            {
+                // Arc
+                point_store s_pt = curve_end_pts.all_pts.ElementAt(0);
+                point_store e_pt = curve_end_pts.all_pts.ElementAt(1);
+                point_store arc_center_pt = curve_cntrl_pts.all_pts.ElementAt(0); // Center point is pt 0
+                point_store arc_crown_pt = curve_cntrl_pts.all_pts.ElementAt(1); // Crown point is pt 1
+
+                // Arc radius
+                double arc_radius = (Math.Sqrt(Math.Pow((arc_center_pt.d_x - arc_crown_pt.d_x), 2) +
+                    Math.Pow((arc_center_pt.d_y - arc_crown_pt.d_y), 2)));
+
+                Tuple<double, double> arc_angles = global_variables.gvariables_static.get_arc_angles(new PointF((float)s_pt.d_x, (float)s_pt.d_y),
+                    new PointF((float)e_pt.d_x, (float)e_pt.d_y),
+                    new PointF((float)arc_crown_pt.d_x, (float)arc_crown_pt.d_y),
+                    new PointF((float)arc_center_pt.d_x, (float)arc_center_pt.d_y));
+
+                double arc_start_angle = arc_angles.Item1;
+                double arc_sweep_angle = arc_angles.Item2;
+
+                c_length = arc_radius * arc_sweep_angle * (Math.PI / 180.0f);
+            }
+            else
+            {
+                // Bezier
+                List<point_store> bezier_c_pts = curve_t_pts.all_pts.ToList();
+                point_store s_pt = bezier_c_pts.First();
+
+
+                for (int i = 1; i < bezier_c_pts.Count; i++)
+                {
+                    point_store e_pt = bezier_c_pts[i];
+
+                    c_length = c_length + (Math.Sqrt(Math.Pow((s_pt.d_x - e_pt.d_x), 2) + Math.Pow((s_pt.d_y - e_pt.d_y), 2)));
+
+                    s_pt = e_pt;
+                }
+
+            }
+
+
+            return c_length;
         }
 
         public List<string> get_curve_data()
@@ -74,6 +135,9 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
             // End PT
             curve_data.Add(curve_end_pts.all_pts.ElementAt(1).pt_id.ToString());
+
+            // Element Length
+            curve_data.Add(curve_length.ToString("F4"));
 
             // Element density
             curve_data.Add("-100");

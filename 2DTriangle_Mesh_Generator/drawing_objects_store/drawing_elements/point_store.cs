@@ -13,7 +13,7 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
         private int _x;
         private int _y;
         private Color _pt_clr = Color.Red;
-        private Color _highlight_pt_clr = Color.Red;
+        private Color _highlight_pt_clr = Color.Cyan;
 
         private double pt_paint_x;
         private double pt_paint_y;
@@ -81,13 +81,6 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
         public point_store(int t_pt_id, double t_x, double t_y, Color clr)
         {
-            // No need to check below (bcoz or points are sent scaled to 1.0f
-            //if ((t_x < -2000 || t_x > 2000) || (t_y < -2000 || t_y > 2000))
-            //{
-            //    throw new ArgumentException("Point must be in range [-2000, 2000]");
-            //}
-
-            // input t_x & t_y should be less than 2000.0000000 (to avoid exceeding int size)
             // Main constructor
             this.pt_id = t_pt_id;
             this.d_x = t_x;

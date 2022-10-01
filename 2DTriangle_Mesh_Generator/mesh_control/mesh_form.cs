@@ -16,12 +16,14 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
     {
         private main_form parent_form;
         private geometry_store geom;
+        private double minimum_curve_length = 0.0;
+
 
         public int selected_surf_id { get; private set; }
 
         public int selected_edge_id { get; private set; }
 
-        public mesh_form(geometry_store main_geom,main_form t_parent_form)
+        public mesh_form(geometry_store main_geom, main_form t_parent_form)
         {
             InitializeComponent();
             form_size_control();
@@ -91,6 +93,15 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
 
         private void button_setelemsize_Click(object sender, EventArgs e)
         {
+            // Check wether the input element size is bigger than minimum element size
+            double inpt_element_length = 0.0;
+            Double.TryParse(textBox_elemsize.Text, out inpt_element_length);
+            if (inpt_element_length>minimum_curve_length)
+            {
+                textBox_elemsize.Text = minimum_curve_length.ToString("F4");
+                inpt_element_length = minimum_curve_length;
+            }
+
 
         }
 
@@ -115,12 +126,15 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                 // Find the surface with surf id
                 int surf_index = 0;
 
-               foreach(surface_store surf in geom.all_surfaces)
+                foreach (surface_store surf in geom.all_surfaces)
                 {
-                    if(surf_id == surf.surf_id)
+                    if (surf_id == surf.surf_id)
                     {
                         this.selected_surf_id = surf_id;
                         this.parent_form.highlight_selected_surface(surf_id);
+
+                        double c_length;
+                        minimum_curve_length = Double.MaxValue;
 
                         dataGridView_edge.Rows.Clear();
                         // Fill the edges from the selected surfaces
@@ -129,17 +143,39 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                         {
                             // set the outer boundary curves
                             fill_edge_datagridview(curves.get_curve_data());
+                            if(curves.curve_type == curve_store.curve_types_enum.line)
+                            {
+                                c_length = curves.curve_length;
+                            }
+                            else
+                            {
+                                c_length = curves.curve_length * 0.5;
+                            }
+                            minimum_curve_length = minimum_curve_length > c_length ? c_length : minimum_curve_length;
                         }
 
-                        
-                        foreach(closed_boundary_store innr_bndry in surf.closed_inner_bndries)
+
+                        foreach (closed_boundary_store innr_bndry in surf.closed_inner_bndries)
                         {
                             // Set the inner boundary curves
                             foreach (curve_store curves in innr_bndry.boundary_curves)
                             {
                                 fill_edge_datagridview(curves.get_curve_data());
+
+                                if (curves.curve_type == curve_store.curve_types_enum.line)
+                                {
+                                    c_length = curves.curve_length;
+                                }
+                                else
+                                {
+                                    c_length = curves.curve_length * 0.5;
+                                }
+                                minimum_curve_length = minimum_curve_length > c_length ? c_length : minimum_curve_length;
                             }
                         }
+
+                        // Set the minimum curve length 
+                        textBox_elemsize.Text = minimum_curve_length.ToString("F4");
 
                         return;
                     }

@@ -35,6 +35,11 @@
             this.button_delete = new System.Windows.Forms.Button();
             this.button_keep = new System.Windows.Forms.Button();
             this.dataGridView_surface = new System.Windows.Forms.DataGridView();
+            this.Column_surfaceID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column_endptid = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column_boundaryid = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column_nested = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column_meshexist = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.label1 = new System.Windows.Forms.Label();
             this.textBox_elemsize = new System.Windows.Forms.TextBox();
             this.dataGridView_edge = new System.Windows.Forms.DataGridView();
@@ -45,14 +50,10 @@
             this.Column_edgeID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column_startpt = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column_endID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column_elem_length = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column_elemdensity = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column_edgemeshed = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column_edgetype = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column_surfaceID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column_endptid = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column_boundaryid = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column_nested = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column_meshexist = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_surface)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_edge)).BeginInit();
             this.SuspendLayout();
@@ -60,7 +61,7 @@
             // button_mesh
             // 
             this.button_mesh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button_mesh.Location = new System.Drawing.Point(429, 320);
+            this.button_mesh.Location = new System.Drawing.Point(451, 320);
             this.button_mesh.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.button_mesh.Name = "button_mesh";
             this.button_mesh.Size = new System.Drawing.Size(133, 38);
@@ -72,7 +73,7 @@
             // button_delete
             // 
             this.button_delete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button_delete.Location = new System.Drawing.Point(599, 320);
+            this.button_delete.Location = new System.Drawing.Point(621, 320);
             this.button_delete.Name = "button_delete";
             this.button_delete.Size = new System.Drawing.Size(133, 37);
             this.button_delete.TabIndex = 1;
@@ -83,7 +84,7 @@
             // button_keep
             // 
             this.button_keep.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button_keep.Location = new System.Drawing.Point(775, 320);
+            this.button_keep.Location = new System.Drawing.Point(797, 320);
             this.button_keep.Name = "button_keep";
             this.button_keep.Size = new System.Drawing.Size(133, 37);
             this.button_keep.TabIndex = 2;
@@ -120,11 +121,51 @@
             this.dataGridView_surface.TabIndex = 3;
             this.dataGridView_surface.SelectionChanged += new System.EventHandler(this.dataGridView_surface_SelectionChanged);
             // 
+            // Column_surfaceID
+            // 
+            this.Column_surfaceID.HeaderText = "Surface ID";
+            this.Column_surfaceID.MinimumWidth = 6;
+            this.Column_surfaceID.Name = "Column_surfaceID";
+            this.Column_surfaceID.ReadOnly = true;
+            this.Column_surfaceID.Width = 50;
+            // 
+            // Column_endptid
+            // 
+            this.Column_endptid.HeaderText = "Endpt ID";
+            this.Column_endptid.MinimumWidth = 6;
+            this.Column_endptid.Name = "Column_endptid";
+            this.Column_endptid.ReadOnly = true;
+            this.Column_endptid.Width = 125;
+            // 
+            // Column_boundaryid
+            // 
+            this.Column_boundaryid.HeaderText = "Boundary ID";
+            this.Column_boundaryid.MinimumWidth = 6;
+            this.Column_boundaryid.Name = "Column_boundaryid";
+            this.Column_boundaryid.ReadOnly = true;
+            this.Column_boundaryid.Width = 125;
+            // 
+            // Column_nested
+            // 
+            this.Column_nested.HeaderText = "Nested Boundary ID";
+            this.Column_nested.MinimumWidth = 6;
+            this.Column_nested.Name = "Column_nested";
+            this.Column_nested.ReadOnly = true;
+            this.Column_nested.Width = 125;
+            // 
+            // Column_meshexist
+            // 
+            this.Column_meshexist.HeaderText = "Mesh Exist";
+            this.Column_meshexist.MinimumWidth = 6;
+            this.Column_meshexist.Name = "Column_meshexist";
+            this.Column_meshexist.ReadOnly = true;
+            this.Column_meshexist.Width = 50;
+            // 
             // label1
             // 
             this.label1.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(49, 262);
+            this.label1.Location = new System.Drawing.Point(60, 262);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(101, 18);
             this.label1.TabIndex = 4;
@@ -133,7 +174,7 @@
             // textBox_elemsize
             // 
             this.textBox_elemsize.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.textBox_elemsize.Location = new System.Drawing.Point(156, 259);
+            this.textBox_elemsize.Location = new System.Drawing.Point(167, 259);
             this.textBox_elemsize.Name = "textBox_elemsize";
             this.textBox_elemsize.Size = new System.Drawing.Size(100, 24);
             this.textBox_elemsize.TabIndex = 5;
@@ -148,6 +189,7 @@
             this.Column_edgeID,
             this.Column_startpt,
             this.Column_endID,
+            this.Column_elem_length,
             this.Column_elemdensity,
             this.Column_edgemeshed,
             this.Column_edgetype});
@@ -159,19 +201,19 @@
             dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.dataGridView_edge.DefaultCellStyle = dataGridViewCellStyle2;
-            this.dataGridView_edge.Location = new System.Drawing.Point(469, 13);
+            this.dataGridView_edge.Location = new System.Drawing.Point(468, 12);
             this.dataGridView_edge.Name = "dataGridView_edge";
             this.dataGridView_edge.ReadOnly = true;
             this.dataGridView_edge.RowHeadersWidth = 20;
             this.dataGridView_edge.RowTemplate.Height = 24;
-            this.dataGridView_edge.Size = new System.Drawing.Size(447, 220);
+            this.dataGridView_edge.Size = new System.Drawing.Size(475, 220);
             this.dataGridView_edge.TabIndex = 6;
             this.dataGridView_edge.SelectionChanged += new System.EventHandler(this.dataGridView_edge_SelectionChanged);
             // 
             // button_setelemsize
             // 
             this.button_setelemsize.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.button_setelemsize.Location = new System.Drawing.Point(287, 253);
+            this.button_setelemsize.Location = new System.Drawing.Point(298, 253);
             this.button_setelemsize.Name = "button_setelemsize";
             this.button_setelemsize.Size = new System.Drawing.Size(137, 37);
             this.button_setelemsize.TabIndex = 7;
@@ -232,6 +274,14 @@
             this.Column_endID.ReadOnly = true;
             this.Column_endID.Width = 50;
             // 
+            // Column_elem_length
+            // 
+            this.Column_elem_length.HeaderText = "Element Length";
+            this.Column_elem_length.MinimumWidth = 6;
+            this.Column_elem_length.Name = "Column_elem_length";
+            this.Column_elem_length.ReadOnly = true;
+            this.Column_elem_length.Width = 75;
+            // 
             // Column_elemdensity
             // 
             this.Column_elemdensity.HeaderText = "Element Density";
@@ -254,49 +304,13 @@
             this.Column_edgetype.MinimumWidth = 6;
             this.Column_edgetype.Name = "Column_edgetype";
             this.Column_edgetype.ReadOnly = true;
-            // 
-            // Column_surfaceID
-            // 
-            this.Column_surfaceID.HeaderText = "Surface ID";
-            this.Column_surfaceID.MinimumWidth = 6;
-            this.Column_surfaceID.Name = "Column_surfaceID";
-            this.Column_surfaceID.ReadOnly = true;
-            this.Column_surfaceID.Width = 50;
-            // 
-            // Column_endptid
-            // 
-            this.Column_endptid.HeaderText = "Endpt ID";
-            this.Column_endptid.MinimumWidth = 6;
-            this.Column_endptid.Name = "Column_endptid";
-            this.Column_endptid.ReadOnly = true;
-            // 
-            // Column_boundaryid
-            // 
-            this.Column_boundaryid.HeaderText = "Boundary ID";
-            this.Column_boundaryid.MinimumWidth = 6;
-            this.Column_boundaryid.Name = "Column_boundaryid";
-            this.Column_boundaryid.ReadOnly = true;
-            // 
-            // Column_nested
-            // 
-            this.Column_nested.HeaderText = "Nested Boundary ID";
-            this.Column_nested.MinimumWidth = 6;
-            this.Column_nested.Name = "Column_nested";
-            this.Column_nested.ReadOnly = true;
-            // 
-            // Column_meshexist
-            // 
-            this.Column_meshexist.HeaderText = "Mesh Exist";
-            this.Column_meshexist.MinimumWidth = 6;
-            this.Column_meshexist.Name = "Column_meshexist";
-            this.Column_meshexist.ReadOnly = true;
-            this.Column_meshexist.Width = 50;
+            this.Column_edgetype.Width = 125;
             // 
             // mesh_form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(928, 368);
+            this.ClientSize = new System.Drawing.Size(950, 368);
             this.Controls.Add(this.button_N);
             this.Controls.Add(this.button_P);
             this.Controls.Add(this.label_edgedensity);
@@ -337,16 +351,17 @@
         private System.Windows.Forms.Label label_edgedensity;
         private System.Windows.Forms.Button button_P;
         private System.Windows.Forms.Button button_N;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column_edgeID;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column_startpt;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column_endID;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column_elemdensity;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column_edgemeshed;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column_edgetype;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column_surfaceID;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column_endptid;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column_boundaryid;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column_nested;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column_meshexist;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_edgeID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_startpt;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_endID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_elem_length;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_elemdensity;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_edgemeshed;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_edgetype;
     }
 }
