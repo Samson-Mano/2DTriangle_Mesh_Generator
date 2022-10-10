@@ -118,7 +118,7 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             // Set the curves associated with boundaries openTK 
             foreach (curve_store bndry_curve in this.boundary_curves)
             {
-                bndry_curve.set_highlight_openTK_objects();
+                bndry_curve.set_highlight_openTK_objects(false);
             }
         }
 

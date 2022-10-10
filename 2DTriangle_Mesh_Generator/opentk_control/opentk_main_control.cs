@@ -74,6 +74,15 @@ namespace _2DTriangle_Mesh_Generator.opentk_control
             }
         }
 
+        public void update_shader_uniform_var(int s_type,Color txt_clr)
+        {
+            // Change the txt shader color uniform variable
+            if (s_type == 1)
+            {
+                this._txt_shader.SetVector4("u_Color", new Vector4(txt_clr.R, txt_clr.G, txt_clr.B, 1.0f));
+            }
+        }
+
         public void update_drawing_area_size(int width, int height,double bound_x, double bound_y)
         {
             // update the drawing area size

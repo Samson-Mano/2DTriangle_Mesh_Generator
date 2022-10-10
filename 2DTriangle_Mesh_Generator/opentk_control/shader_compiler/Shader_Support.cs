@@ -203,6 +203,12 @@ namespace _2DTriangle_Mesh_Generator.opentk_control.shader_compiler
             // save the final translation
             _previous_translation = _current_translation;
         }
+
+        public void set_txtshader_color(Color t_clr)
+        {
+            Vector4 txt_clr = new Vector4(t_clr.R,t_clr.G,t_clr.B,1.0f);
+            this_shader.SetVector4("u_Color", txt_clr);
+        }
         #endregion
     }
 }

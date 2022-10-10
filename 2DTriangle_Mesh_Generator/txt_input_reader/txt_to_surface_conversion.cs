@@ -98,6 +98,11 @@ namespace _2DTriangle_Mesh_Generator.txt_input_reader
                 this.dr_tx = (-0.5f * (float)(max_x + min_x));
                 this.dr_ty = (-0.5f * (float)(max_y + min_y));
 
+                // Save the scale and translation values in global variables
+                gvariables_static.drawing_scale = this.dr_scale;
+                gvariables_static.drawing_tx = this.dr_tx;
+                gvariables_static.drawing_ty = this.dr_ty;
+
                 // Update the scale of the surface
                 for (int i = 0; i < this.all_surface.Count; i++)
                 {

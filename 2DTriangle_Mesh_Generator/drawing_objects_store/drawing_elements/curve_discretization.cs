@@ -9,54 +9,73 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 {
     public class curve_discretization
     {
-        Color pt_clr;
+        
+        private int _discretized_count;
+        private curve_store.curve_types_enum _curve_types;
+        private points_list_store _end_pts;
+        private points_list_store _cntrl_pts;
+        private Color pt_clr;
 
-        public Tuple<lines_list_store, points_list_store> get_all_points_at_t(int discretized_count, curve_store.curve_types_enum ctype,points_list_store end_pts, points_list_store cntrl_pts, Color t_pt_clr)
+        // save arc parameters (Start angle, sweep angle) not valid to use this values for lines & bezier
+        private double _start_angle;
+        private double _sweep_angle;
+        private int _arc_orientation;
+
+        public curve_discretization(int t_discretized_count, curve_store.curve_types_enum t_ctype, points_list_store t_end_pts, points_list_store t_cntrl_pts, Color t_pt_clr)
         {
+            // constructor
+            this._discretized_count = t_discretized_count;
+            this._curve_types = t_ctype;
+            this._end_pts = t_end_pts;  
+            this._cntrl_pts = t_cntrl_pts;  
             this.pt_clr = t_pt_clr;
-            if (ctype == curve_store.curve_types_enum.line)
+        }
+
+
+        public Tuple<lines_list_store, points_list_store> get_all_points_at_t()
+        {
+            if (this._curve_types == curve_store.curve_types_enum.line)
             {
                 // Line parameterized
-                point_store start_pt = end_pts.all_pts.ElementAt(0);
-                point_store end_pt = end_pts.all_pts.ElementAt(1);
+                point_store start_pt = this._end_pts.all_pts.ElementAt(0);
+                point_store end_pt = this._end_pts.all_pts.ElementAt(1);
 
-                return get_lines_discretized(discretized_count, start_pt, end_pt);
+                return get_lines_discretized(this._discretized_count, start_pt, end_pt);
             }
-            else if (ctype == curve_store.curve_types_enum.arc)
+            else if (this._curve_types == curve_store.curve_types_enum.arc)
             {
                 // Arc parameterized
-                point_store start_pt = end_pts.all_pts.ElementAt(0);
-                point_store end_pt = end_pts.all_pts.ElementAt(1);
-                point_store center_pt = cntrl_pts.all_pts.ElementAt(0); // Center point is pt 0
-                point_store crown_pt = cntrl_pts.all_pts.ElementAt(1); // Crown point is pt 1
+                point_store start_pt = this._end_pts.all_pts.ElementAt(0);
+                point_store end_pt = this._end_pts.all_pts.ElementAt(1);
+                point_store center_pt = this._cntrl_pts.all_pts.ElementAt(0); // Center point is pt 0
+                point_store crown_pt = this._cntrl_pts.all_pts.ElementAt(1); // Crown point is pt 1
 
-                return get_arcs_discretized(discretized_count, start_pt, end_pt, crown_pt, center_pt);
+                return get_arcs_discretized(this._discretized_count, start_pt, end_pt, crown_pt, center_pt);
             }
-            else if (ctype == curve_store.curve_types_enum.bezier)
+            else if (this._curve_types == curve_store.curve_types_enum.bezier)
             {
                 // 3,4,5 point bezier
                 List<point_store> bz_cntrl_pts = new List<point_store>();
                 
                 // Start point
-                bz_cntrl_pts.Add(end_pts.all_pts.ElementAt(0));
+                bz_cntrl_pts.Add(this._end_pts.all_pts.ElementAt(0));
 
                 // Control points
-                foreach(point_store c_pts in cntrl_pts.all_pts)
+                foreach(point_store c_pts in this._cntrl_pts.all_pts)
                 {
                     bz_cntrl_pts.Add(c_pts);
                 }
 
                 // End point
-                bz_cntrl_pts.Add(end_pts.all_pts.ElementAt(1));
+                bz_cntrl_pts.Add(this._end_pts.all_pts.ElementAt(1));
 
    
-                return get_beziers_discretized(discretized_count, bz_cntrl_pts);
+                return get_beziers_discretized(this._discretized_count, bz_cntrl_pts);
             }
 
             // Below line must never trigger
             return null;
         }
-
 
         private Tuple<lines_list_store, points_list_store> get_lines_discretized(int discretized_count, point_store start_pt, point_store end_pt)
         {
@@ -108,9 +127,10 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
             // Arc radii, arc start, sweep angle and arc orientation
             double arc_radii = Math.Sqrt(Math.Pow(center_pt.d_x - crown_pt.d_x, 2) + Math.Pow(center_pt.d_y - crown_pt.d_y, 2));
-            double start_angle = g_angles.Item1;
-            double sweep_angle = g_angles.Item2;
-            int arc_orientation = global_variables.gvariables_static.ordered_orientation(new PointF((float)start_pt.d_x, (float)start_pt.d_y),
+            this._start_angle = g_angles.Item1;
+            this._sweep_angle = g_angles.Item2;
+
+            this._arc_orientation = global_variables.gvariables_static.ordered_orientation(new PointF((float)start_pt.d_x, (float)start_pt.d_y),
                 new PointF((float)end_pt.d_x, (float)end_pt.d_y),
                 new PointF((float)crown_pt.d_x, (float)crown_pt.d_y));
 
@@ -119,7 +139,7 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             double ept_x, ept_y;
 
             double param_t = ((double)0 / (double)(discretized_count - 1));
-            Tuple<double, double> pt_at_param_t = get_arc_pt_at_t(param_t, start_angle, sweep_angle, arc_radii, center_pt.d_x, center_pt.d_y, arc_orientation);
+            Tuple<double, double> pt_at_param_t = get_arc_pt_at_t(param_t, this._start_angle, this._sweep_angle, arc_radii, center_pt.d_x, center_pt.d_y, this._arc_orientation);
             spt_x = pt_at_param_t.Item1;
             spt_y = pt_at_param_t.Item2;
 
@@ -129,7 +149,7 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             for (int i = 1; i < discretized_count; i++)
             {
                 param_t = ((double)i / (double)(discretized_count - 1));
-                pt_at_param_t = get_arc_pt_at_t(param_t, start_angle, sweep_angle, arc_radii, center_pt.d_x, center_pt.d_y, arc_orientation);
+                pt_at_param_t = get_arc_pt_at_t(param_t, this._start_angle, this._sweep_angle, arc_radii, center_pt.d_x, center_pt.d_y, this._arc_orientation);
                 ept_x = pt_at_param_t.Item1;
                 ept_y = pt_at_param_t.Item2;
 
@@ -182,6 +202,55 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             }
 
             return new Tuple<lines_list_store, points_list_store>(rslt_ln_list, rslt_pt_list);
+        }
+
+
+
+        public Tuple<double,double> get_point_at_t(double param_t)
+        {
+            if (this._curve_types == curve_store.curve_types_enum.line)
+            {
+                // Line parameterized
+                point_store start_pt = this._end_pts.all_pts.ElementAt(0);
+                point_store end_pt = this._end_pts.all_pts.ElementAt(1);
+
+                return get_line_pt_at_t(param_t, start_pt, end_pt);
+            }
+            else if (this._curve_types == curve_store.curve_types_enum.arc)
+            {
+                // Arc parameterized
+                point_store start_pt = this._end_pts.all_pts.ElementAt(0);
+                point_store end_pt = this._end_pts.all_pts.ElementAt(1);
+                point_store center_pt = this._cntrl_pts.all_pts.ElementAt(0); // Center point is pt 0
+                point_store crown_pt = this._cntrl_pts.all_pts.ElementAt(1); // Crown point is pt 1
+                double arc_radii = Math.Sqrt(Math.Pow(center_pt.d_x - crown_pt.d_x, 2) + Math.Pow(center_pt.d_y - crown_pt.d_y, 2));
+
+                return get_arc_pt_at_t(param_t, this._start_angle, this._sweep_angle, arc_radii, center_pt.d_x, center_pt.d_y, this._arc_orientation);
+            }
+            else if (this._curve_types == curve_store.curve_types_enum.bezier)
+            {
+                // 3,4,5 point bezier
+                List<point_store> bz_cntrl_pts = new List<point_store>();
+
+                // Start point
+                bz_cntrl_pts.Add(this._end_pts.all_pts.ElementAt(0));
+
+                // Control points
+                foreach (point_store c_pts in this._cntrl_pts.all_pts)
+                {
+                    bz_cntrl_pts.Add(c_pts);
+                }
+
+                // End point
+                bz_cntrl_pts.Add(this._end_pts.all_pts.ElementAt(1));
+
+
+                return getCasteljauPoint(bz_cntrl_pts, bz_cntrl_pts.Count - 1, 0, param_t);
+            }
+
+            // Below line must never trigger
+            return null;
+
         }
 
         public Tuple<double, double> get_line_pt_at_t(double param_t, point_store start_pt, point_store end_pt)

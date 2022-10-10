@@ -13,7 +13,11 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
         public double curve_length { get; private set; }
 
+        public int curve_element_density { get; private set; }
+
         public points_list_store curve_end_pts { get; private set; }
+
+        public point_store curve_mid_pt { get; private set; }
 
         public points_list_store curve_cntrl_pts { get; private set; }
 
@@ -21,9 +25,16 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
         public lines_list_store curve_as_tlines { get; private set; }
 
+        public HashSet<ellipse_store> curve_element_density_nodes { get; private set; }
+
         public curve_types_enum curve_type { get; private set; }
 
         public Color curve_color { get; private set; }
+
+        private curve_discretization _curve_discrezitation;
+
+        private Label_list_store elment_density_label;
+
 
         public enum curve_types_enum
         {
@@ -56,11 +67,16 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
             // Discretize the curve into segments
             // Find all the curve points & lines
-            Tuple<lines_list_store, points_list_store> temp = new curve_discretization().get_all_points_at_t(100, t_ctype, this.curve_end_pts, this.curve_cntrl_pts, this.curve_color);
+            this._curve_discrezitation = new curve_discretization(100, t_ctype, this.curve_end_pts, this.curve_cntrl_pts, this.curve_color);
+            Tuple<lines_list_store, points_list_store> temp = this._curve_discrezitation.get_all_points_at_t();
 
             // Add all the lines and points to the list
             this.curve_as_tlines = temp.Item1;
             this.curve_t_pts = temp.Item2;
+
+            // get the mid pt
+            this.curve_mid_pt = this.curve_t_pts.all_pts.ElementAt(50);
+
 
             // Add curve length
             this.curve_length = get_c_length();
@@ -122,6 +138,60 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             return c_length;
         }
 
+        public void set_curve_elementdensity(double min_element_length)
+        {
+            double elem_wd = this.curve_length / min_element_length;
+            this.curve_element_density = (int)Math.Ceiling(Math.Round(elem_wd));
+
+            // Set the element density ellipse (to indicate the element density)
+            set_curve_elementdensity_ellipse();
+        }
+
+        public void set_curve_elementdensity(int t_element_density)
+        {
+            this.curve_element_density = t_element_density;
+
+            // Set the element density ellipse (to indicate the element density)
+            set_curve_elementdensity_ellipse();
+        }
+
+        public void set_curve_elementdensity_ellipse()
+        {
+            // Set the curve element density lines
+            curve_element_density_nodes = new HashSet<ellipse_store>();
+            int e_id = 0;
+
+            for (int i = 1; i < this.curve_element_density; i++)
+            {
+                double elem_t = (double)i / this.curve_element_density;
+
+                // Get the point at parameter x
+                Tuple<double, double> pt_at_param_t = this._curve_discrezitation.get_point_at_t(elem_t);
+                double pt_x, pt_y;
+
+                pt_x = pt_at_param_t.Item1;
+                pt_y = pt_at_param_t.Item2;
+
+                curve_element_density_nodes.Add(new ellipse_store(e_id, pt_x, pt_y,
+                    global_variables.gvariables_static.drawing_scale,
+                    -global_variables.gvariables_static.drawing_tx,
+                    -global_variables.gvariables_static.drawing_ty,
+                    Color.DarkRed));
+                e_id++;
+            }
+
+            // Set the element density text
+            string label_val = this.curve_element_density.ToString();
+            elment_density_label = new Label_list_store();
+            elment_density_label.add_label(this.curve_id, label_val, this.curve_mid_pt.d_x, this.curve_mid_pt.d_y,
+                global_variables.gvariables_static.drawing_scale, 
+                -global_variables.gvariables_static.drawing_tx, 
+                -global_variables.gvariables_static.drawing_ty, 
+                Color.DarkRed);
+
+        }
+
+
         public List<string> get_curve_data()
         {
             // get the curve data
@@ -140,7 +210,7 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             curve_data.Add(curve_length.ToString("F4"));
 
             // Element density
-            curve_data.Add("-100");
+            curve_data.Add(curve_element_density.ToString());
 
 
             // Is element meshed
@@ -169,10 +239,22 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
         }
 
 
-        public void set_highlight_openTK_objects()
+        public void set_highlight_openTK_objects(bool is_selected)
         {
             // Set the discretized lines openTK 
             this.curve_as_tlines.set_highlight_openTK_objects();
+
+            // Paint the discretized element list
+            foreach (ellipse_store e in this.curve_element_density_nodes)
+            {
+                e.set_openTK_objects();
+            }
+
+            if (is_selected == true)
+            {
+                // Set the text indicating element density to show the edge is selected
+                elment_density_label.set_openTK_objects();
+            }
         }
 
         public void paint_curve()
@@ -187,6 +269,17 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             // Paint the highlight curves
             // Set openTK becore calling this function
             this.curve_as_tlines.paint_all_highlight_lines();
+
+            // Paint the discretized element list
+            foreach (ellipse_store e in this.curve_element_density_nodes)
+            {
+                e.paint_ellipse();
+            }
+        }
+
+        public void paint_highlight_curve_label()
+        {
+            elment_density_label.paint_labels();
         }
 
         public override bool Equals(object obj)

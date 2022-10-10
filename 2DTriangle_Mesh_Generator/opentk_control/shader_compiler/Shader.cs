@@ -193,6 +193,12 @@ namespace _2DTriangle_Mesh_Generator.opentk_control.shader_compiler
             GL.UniformMatrix4(_uniformLocations[name], true, ref data);
         }
 
+        public void SetVector4(string name, Vector4 data)
+        {
+            GL.UseProgram(Handle);
+            GL.Uniform4(_uniformLocations[name], data);
+        }
+
         /// <summary>
         /// Set a uniform Vector3 on this shader.
         /// </summary>

@@ -213,6 +213,7 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             GL.ActiveTexture(TextureUnit.Texture0);
 
             // Load first 128 characters of ASCII set
+            this._characters = new Dictionary<uint, Character>();
             for (uint c = 0; c < 128; c++)
             {
                 try

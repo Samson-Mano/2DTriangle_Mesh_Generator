@@ -19,6 +19,10 @@ namespace _2DTriangle_Mesh_Generator.global_variables
 
         public static double boundary_scale = 1.0;
 
+        public static double drawing_scale = 0.0;
+        public static double drawing_tx = 0.0;
+        public static double drawing_ty = 0.0;
+
         public static int RoundOff(this int i)
         {
             // Roundoff to nearest 10 (used to display zoom value)

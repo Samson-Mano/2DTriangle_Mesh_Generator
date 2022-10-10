@@ -16,8 +16,6 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
     {
         private main_form parent_form;
         private geometry_store geom;
-        private double minimum_curve_length = 0.0;
-
 
         public int selected_surf_id { get; private set; }
 
@@ -96,22 +94,137 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
             // Check wether the input element size is bigger than minimum element size
             double inpt_element_length = 0.0;
             Double.TryParse(textBox_elemsize.Text, out inpt_element_length);
-            if (inpt_element_length>minimum_curve_length)
+
+            double min_mesh_size = 0.0f;
+            int surf_id;
+            int selected_index = dataGridView_surface.CurrentCell.RowIndex;
+
+            if (selected_index > -1)
             {
-                textBox_elemsize.Text = minimum_curve_length.ToString("F4");
-                inpt_element_length = minimum_curve_length;
+                surf_id = Int32.Parse(dataGridView_surface.Rows[selected_index].Cells[0].Value.ToString());
+
+                // Find the surface with surf id
+                foreach (surface_store surf in geom.all_surfaces)
+                {
+                    if (surf_id == surf.surf_id)
+                    {
+                        min_mesh_size = surf.mesh_elem_size;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                return;
+            }
+
+            // Check the input element length
+            if (inpt_element_length > min_mesh_size)
+            {
+                textBox_elemsize.Text = min_mesh_size.ToString("F4");
+                inpt_element_length = min_mesh_size;
             }
 
 
+            int surf_index = 0;
+            foreach (surface_store surf in geom.all_surfaces)
+            {
+                if (surf_id == surf.surf_id)
+                {
+                    // Set the new element length
+                    geom.all_surfaces.ElementAt(surf_index).set_curve_element_density(inpt_element_length);
+                    break;
+                }
+                surf_index++;
+            }
+
+            // Refill the data gridview
+            set_edge_datagridview(surf_index);
+            this.parent_form.highlight_selected_surface(surf_id);
         }
 
         private void button_N_Click(object sender, EventArgs e)
         {
+            // Decrease element density
+            // Update the value in edge datagrid view
+            int selected_index = dataGridView_edge.CurrentCell.RowIndex;
+            if (selected_index < 0)
+            {
+                // Exit if nothing is selected
+                return;
+            }
 
+            int element_density = Int32.Parse(dataGridView_edge.Rows[selected_index].Cells[4].Value.ToString());
+
+
+            if (dataGridView_edge.Rows[selected_index].Cells[6].Value.ToString() == "line")
+            {
+                // Selected edge is line (so the lowest can be 1)
+                if (element_density != 1)
+                {
+                    element_density--;
+                }
+            }
+            else
+            {
+                // Selected edge is line (so the lowest can be 1)
+                if (element_density != 2)
+                {
+                    element_density--;
+                }
+            }
+
+            dataGridView_edge.Rows[selected_index].Cells[4].Value = element_density;
+
+            // Find the surface with surf id
+            int surf_index = 0;
+
+            foreach (surface_store surf in geom.all_surfaces)
+            {
+                // Select the surface
+                if (this.selected_surf_id == surf.surf_id)
+                {
+                    geom.all_surfaces.ElementAt(surf_index).set_curve_element_density(this.selected_edge_id, element_density);
+                    break;
+
+                }
+                surf_index++;
+            }
+
+            this.parent_form.highlight_selected_edge(this.selected_surf_id, this.selected_edge_id);
         }
 
         private void button_P_Click(object sender, EventArgs e)
         {
+            // Increase element density
+            // Update the value in edge datagrid view
+            int selected_index = dataGridView_edge.CurrentCell.RowIndex;
+            if (selected_index < 0)
+            {
+                // Exit if nothing is selected
+                return;
+            }
+
+            int element_density = Int32.Parse(dataGridView_edge.Rows[selected_index].Cells[4].Value.ToString());
+            element_density++;
+
+            dataGridView_edge.Rows[selected_index].Cells[4].Value = element_density;
+
+            int surf_index = 0;
+
+            // Find the surface with surf id
+            foreach (surface_store surf in geom.all_surfaces)
+            {
+                // Select the surface
+                if (this.selected_surf_id == surf.surf_id)
+                {
+                    geom.all_surfaces.ElementAt(surf_index).set_curve_element_density(this.selected_edge_id, element_density);
+                    break;
+                }
+                surf_index++;
+            }
+
+            this.parent_form.highlight_selected_edge(this.selected_surf_id, this.selected_edge_id);
 
         }
 
@@ -133,49 +246,10 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                         this.selected_surf_id = surf_id;
                         this.parent_form.highlight_selected_surface(surf_id);
 
-                        double c_length;
-                        minimum_curve_length = Double.MaxValue;
-
-                        dataGridView_edge.Rows.Clear();
-                        // Fill the edges from the selected surfaces
-                        // Outter boundary
-                        foreach (curve_store curves in surf.closed_outer_bndry.boundary_curves)
-                        {
-                            // set the outer boundary curves
-                            fill_edge_datagridview(curves.get_curve_data());
-                            if(curves.curve_type == curve_store.curve_types_enum.line)
-                            {
-                                c_length = curves.curve_length;
-                            }
-                            else
-                            {
-                                c_length = curves.curve_length * 0.5;
-                            }
-                            minimum_curve_length = minimum_curve_length > c_length ? c_length : minimum_curve_length;
-                        }
-
-
-                        foreach (closed_boundary_store innr_bndry in surf.closed_inner_bndries)
-                        {
-                            // Set the inner boundary curves
-                            foreach (curve_store curves in innr_bndry.boundary_curves)
-                            {
-                                fill_edge_datagridview(curves.get_curve_data());
-
-                                if (curves.curve_type == curve_store.curve_types_enum.line)
-                                {
-                                    c_length = curves.curve_length;
-                                }
-                                else
-                                {
-                                    c_length = curves.curve_length * 0.5;
-                                }
-                                minimum_curve_length = minimum_curve_length > c_length ? c_length : minimum_curve_length;
-                            }
-                        }
+                        set_edge_datagridview(surf_index);
 
                         // Set the minimum curve length 
-                        textBox_elemsize.Text = minimum_curve_length.ToString("F4");
+                        textBox_elemsize.Text = surf.mesh_elem_size.ToString("F4");
 
                         return;
                     }
@@ -186,9 +260,72 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
 
         }
 
+        public void set_edge_datagridview(int surf_index)
+        {
+            dataGridView_edge.Rows.Clear();
+            // Fill the edges from the selected surfaces
+            // Outter boundary
+            foreach (curve_store curves in geom.all_surfaces.ElementAt(surf_index).closed_outer_bndry.boundary_curves)
+            {
+                // set the outer boundary curves
+                fill_edge_datagridview(curves.get_curve_data());
+            }
+
+            foreach (closed_boundary_store innr_bndry in geom.all_surfaces.ElementAt(surf_index).closed_inner_bndries)
+            {
+                // Set the inner boundary curves
+                foreach (curve_store curves in innr_bndry.boundary_curves)
+                {
+                    fill_edge_datagridview(curves.get_curve_data());
+                }
+            }
+        }
+
         private void dataGridView_edge_SelectionChanged(object sender, EventArgs e)
         {
+            // Update selected rows
+            int surface_selected_index = dataGridView_surface.CurrentCell.RowIndex;
+            int edge_selected_index = dataGridView_edge.CurrentCell.RowIndex;
+            if (surface_selected_index > -1 && edge_selected_index > -1)
+            {
+                int surf_id = Int32.Parse(dataGridView_surface.Rows[surface_selected_index].Cells[0].Value.ToString());
+                int edge_id = Int32.Parse(dataGridView_edge.Rows[edge_selected_index].Cells[0].Value.ToString());
 
+                // Find the edge with edge id
+                foreach (surface_store surf in geom.all_surfaces)
+                {
+                    if (surf_id == surf.surf_id)
+                    {
+                        // Outter boundaries
+                        foreach (curve_store outer_curves in surf.closed_outer_bndry.boundary_curves)
+                        {
+                            if (edge_id == outer_curves.curve_id)
+                            {
+                                this.selected_edge_id = edge_id;
+                                this.parent_form.highlight_selected_edge(surf_id,edge_id);
+
+                                return;
+                            }
+                        }
+
+                        foreach (closed_boundary_store innr_bndries in surf.closed_inner_bndries)
+                        {
+                            // Inner boundaries
+                            foreach (curve_store inner_curves in innr_bndries.boundary_curves)
+                            {
+                                if (edge_id == inner_curves.curve_id)
+                                {
+                                    this.selected_edge_id = edge_id;
+                                    this.parent_form.highlight_selected_edge(surf_id,edge_id);
+
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
         }
 
         private void button_mesh_Click(object sender, EventArgs e)

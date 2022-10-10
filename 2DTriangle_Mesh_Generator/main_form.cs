@@ -113,16 +113,19 @@ namespace _2DTriangle_Mesh_Generator
         public void highlight_selected_surface(int surf_id)
         {
             // Surface selection changed from mesh form
-            geom_obj.set_highlight_openTK_objects(surf_id);
+            geom_obj.set_surface_highlight_openTK_objects(surf_id);
 
             // Refresh the controller
             glControl_main_panel.Invalidate();
         }
 
-        public void highlight_selected_edge(int edge_id)
+        public void highlight_selected_edge(int surf_id,int edge_id)
         {
             // Edge selection changed from mesh form
-          //  geom_obj.paint_highlight_edge(edge_id);
+            geom_obj.set_edge_highlight_openTK_objects(surf_id, edge_id);
+            
+            // Refresh the controller
+            glControl_main_panel.Invalidate();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -165,6 +168,7 @@ namespace _2DTriangle_Mesh_Generator
 
             // Display the label
             g_control.set_opengl_shader(1);
+            g_control.update_shader_uniform_var(1, Color.Green);
             geom_obj.paint_label();
 
             if (is_mesh_form_open == true)
@@ -174,6 +178,13 @@ namespace _2DTriangle_Mesh_Generator
                 GL.LineWidth(3.30f);
                 // Surface selection changed from mesh form
                 geom_obj.paint_highlight_surface(mesh_form1.selected_surf_id);
+
+                // Edge selection changed from mesh form
+                geom_obj.paint_highlight_edge(mesh_form1.selected_surf_id, mesh_form1.selected_edge_id);
+
+                g_control.set_opengl_shader(1);
+                g_control.update_shader_uniform_var(1, Color.Red);
+                geom_obj.paint_highlight_edge_label(mesh_form1.selected_surf_id, mesh_form1.selected_edge_id);
             }
 
 

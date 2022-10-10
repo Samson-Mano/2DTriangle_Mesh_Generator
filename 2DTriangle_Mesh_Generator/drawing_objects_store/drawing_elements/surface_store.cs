@@ -24,6 +24,8 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
         public double y_centroid { get; private set; }
 
+        public double mesh_elem_size { get; private set; }
+
         public closed_boundary_store closed_outer_bndry { get; private set; }
 
         public HashSet<closed_boundary_store> closed_inner_bndries { get; private set; }
@@ -38,8 +40,6 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
             // Closed inner boundaries
             this.closed_inner_bndries = new HashSet<closed_boundary_store>(t_closed_inner_bndries);
-
-            set_surface_geometric_parameter();
         }
 
         public void update_scale(double d_scale, double tran_tx, double tran_ty)
@@ -53,6 +53,8 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             {
                 this.closed_inner_bndries.ElementAt(i).update_scale(d_scale, tran_tx, tran_ty);
             }
+
+            set_surface_geometric_parameter();
         }
 
         private void set_surface_geometric_parameter()
@@ -103,6 +105,91 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             this.surf_area = (outer_boundary_area - inner_boundary_area);
             this.x_centroid = x_center / this.surf_area;
             this.y_centroid = y_center / this.surf_area;
+
+            // Minimum element size
+            double c_length;
+           this.mesh_elem_size = Double.MaxValue;
+
+            foreach (curve_store curves in closed_outer_bndry.boundary_curves)
+            {
+                // set the outer boundary curves
+                if (curves.curve_type == curve_store.curve_types_enum.line)
+                {
+                    c_length = curves.curve_length;
+                }
+                else
+                {
+                    c_length = curves.curve_length * 0.5;
+                }
+                this.mesh_elem_size = this.mesh_elem_size > c_length ? c_length : this.mesh_elem_size;
+            }
+
+            foreach (closed_boundary_store innr_bndry in closed_inner_bndries)
+            {
+                // Set the inner boundary curves
+                foreach (curve_store curves in innr_bndry.boundary_curves)
+                {
+                    if (curves.curve_type == curve_store.curve_types_enum.line)
+                    {
+                        c_length = curves.curve_length;
+                    }
+                    else
+                    {
+                        c_length = curves.curve_length * 0.5;
+                    }
+                    this.mesh_elem_size = this.mesh_elem_size > c_length ? c_length : this.mesh_elem_size;
+                }
+            }
+
+            // Set the element density
+            set_curve_element_density(this.mesh_elem_size);
+        }
+
+        public void set_curve_element_density(double min_elem_length)
+        {
+            // Closed outter boundary curve element length
+            int i = 0;
+            for(i=0;i<closed_outer_bndry.boundary_curves.Count;i++)
+            {
+                closed_outer_bndry.boundary_curves.ElementAt(i).set_curve_elementdensity(min_elem_length);
+            }
+
+            int j = 0;
+            for(j = 0;j<closed_inner_bndries.Count;j++)
+            {
+                // Set the inner boundary curves element length
+                for (i = 0; i < closed_inner_bndries.ElementAt(j).boundary_curves.Count; i++)
+                {
+                    closed_inner_bndries.ElementAt(j).boundary_curves.ElementAt(i).set_curve_elementdensity(min_elem_length);
+                }
+            }
+        }
+
+        public void set_curve_element_density(int t_curve_id,int element_density)
+        {
+            // Closed outter boundary curve element length
+            int i = 0;
+            for (i = 0; i < closed_outer_bndry.boundary_curves.Count; i++)
+            {
+                if(closed_outer_bndry.boundary_curves.ElementAt(i).curve_id == t_curve_id)
+                {
+                    closed_outer_bndry.boundary_curves.ElementAt(i).set_curve_elementdensity(element_density);
+                    return;
+                }
+            }
+
+            int j = 0;
+            for (j = 0; j < closed_inner_bndries.Count; j++)
+            {
+                // Set the inner boundary curves element length
+                for (i = 0; i < closed_inner_bndries.ElementAt(j).boundary_curves.Count; i++)
+                {
+                    if (closed_inner_bndries.ElementAt(j).boundary_curves.ElementAt(i).curve_id == t_curve_id)
+                    {
+                        closed_inner_bndries.ElementAt(j).boundary_curves.ElementAt(i).set_curve_elementdensity(element_density);
+                    }
+                }
+            }
         }
 
         public List<string> get_surface_data()
