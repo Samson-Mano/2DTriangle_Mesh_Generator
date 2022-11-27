@@ -174,7 +174,6 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                 }
             }
 
-            dataGridView_edge.Rows[selected_index].Cells[4].Value = element_density;
 
             // Find the surface with surf id
             int surf_index = 0;
@@ -184,9 +183,11 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                 // Select the surface
                 if (this.selected_surf_id == surf.surf_id)
                 {
-                    geom.all_surfaces.ElementAt(surf_index).set_curve_element_density(this.selected_edge_id, element_density);
+                    if (geom.all_surfaces.ElementAt(surf_index).set_curve_element_density(this.selected_edge_id, element_density) == false)
+                    {
+                        dataGridView_edge.Rows[selected_index].Cells[4].Value = element_density;
+                    }
                     break;
-
                 }
                 surf_index++;
             }
@@ -208,7 +209,7 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
             int element_density = Int32.Parse(dataGridView_edge.Rows[selected_index].Cells[4].Value.ToString());
             element_density++;
 
-            dataGridView_edge.Rows[selected_index].Cells[4].Value = element_density;
+
 
             int surf_index = 0;
 
@@ -218,7 +219,10 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                 // Select the surface
                 if (this.selected_surf_id == surf.surf_id)
                 {
-                    geom.all_surfaces.ElementAt(surf_index).set_curve_element_density(this.selected_edge_id, element_density);
+                    if (geom.all_surfaces.ElementAt(surf_index).set_curve_element_density(this.selected_edge_id, element_density) == false)
+                    {
+                        dataGridView_edge.Rows[selected_index].Cells[4].Value = element_density;
+                    }
                     break;
                 }
                 surf_index++;
@@ -302,7 +306,7 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                             if (edge_id == outer_curves.curve_id)
                             {
                                 this.selected_edge_id = edge_id;
-                                this.parent_form.highlight_selected_edge(surf_id,edge_id);
+                                this.parent_form.highlight_selected_edge(surf_id, edge_id);
 
                                 return;
                             }
@@ -316,7 +320,7 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                                 if (edge_id == inner_curves.curve_id)
                                 {
                                     this.selected_edge_id = edge_id;
-                                    this.parent_form.highlight_selected_edge(surf_id,edge_id);
+                                    this.parent_form.highlight_selected_edge(surf_id, edge_id);
 
                                     return;
                                 }
@@ -330,16 +334,140 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
 
         private void button_mesh_Click(object sender, EventArgs e)
         {
+            // Create mesh --
+            // Create an input for the mesh
+            string mesh_inpt = "";
+            int inner_id;
 
+            // Get the surface index
+            int surf_index = 0;
+            foreach (surface_store surf in geom.all_surfaces)
+            {
+                if (this.selected_surf_id == surf.surf_id)
+                {
+                    break;
+                }
+                surf_index++;
+            }
+
+            // Outter boundary
+            mesh_inpt = mesh_inpt + "*** OUTER BOUNDARY ID =" + geom.all_surfaces.ElementAt(surf_index).closed_outer_bndry.closed_bndry_id + Environment.NewLine;
+            foreach (curve_store curves in geom.all_surfaces.ElementAt(surf_index).closed_outer_bndry.boundary_curves)
+            {
+                // get the outer boundary curves end pt data
+                mesh_inpt = mesh_inpt + "** ENDPOINT ID =" + curves.curve_end_pts.all_pts.ElementAt(0).pt_id +
+                    ", x=" + curves.curve_end_pts.all_pts.ElementAt(0).d_x +
+                    ", y=" + curves.curve_end_pts.all_pts.ElementAt(0).d_y +
+                    Environment.NewLine;
+
+                // get the outter boundary curves inner pt data
+                inner_id = 0;
+                foreach (point_store inr_pt in curves.curve_element_density_pts)
+                {
+                    mesh_inpt = mesh_inpt + "e" + curves.curve_id + "_" + inner_id +
+                        ", x=" + inr_pt.d_x +
+                        ", y=" + inr_pt.d_y +
+                        Environment.NewLine;
+
+                    inner_id++;
+                }
+            }
+            mesh_inpt = mesh_inpt + "END" + Environment.NewLine;
+
+
+            foreach (closed_boundary_store innr_bndry in geom.all_surfaces.ElementAt(surf_index).closed_inner_bndries)
+            {
+                // Set the inner boundary curves
+                mesh_inpt = mesh_inpt + "*** INNER BOUNDARY ID =" + innr_bndry.closed_bndry_id + Environment.NewLine;
+                foreach (curve_store curves in innr_bndry.boundary_curves)
+                {
+                    // get the inner boundary curves end pt data
+                    mesh_inpt = mesh_inpt + "** ENDPOINT ID =" + curves.curve_end_pts.all_pts.ElementAt(0).pt_id +
+                        ", x=" + curves.curve_end_pts.all_pts.ElementAt(0).d_x +
+                        ", y=" + curves.curve_end_pts.all_pts.ElementAt(0).d_y +
+                        Environment.NewLine;
+
+                    // get the inner boundary curves inner pt data
+                    inner_id = 0;
+                    foreach (point_store inr_pt in curves.curve_element_density_pts)
+                    {
+                        mesh_inpt = mesh_inpt + "e" + curves.curve_id + "_" + inner_id +
+                            ", x=" + inr_pt.d_x +
+                            ", y=" + inr_pt.d_y +
+                            Environment.NewLine;
+
+                        inner_id++;
+                    }
+                }
+                mesh_inpt = mesh_inpt + "END" + Environment.NewLine;
+            }
+
+            constrained_delaunay_triangulation CDT = new constrained_delaunay_triangulation(mesh_inpt);
+
+            // Get the mesh
+            if (CDT.is_surface_read == true)
+            {
+                this.parent_form.update_mesh_data(CDT.input_surface.mesh_data,true);
+            }
+
+
+            // global_variables.gvariables_static.Show_error_Dialog("Input to Mesh algorithm", mesh_inpt);
+            // Set the mesh edges  is_meshed = true
+            for (int i = 0; i < geom.all_surfaces.ElementAt(surf_index).closed_outer_bndry.boundary_curves.Count; i++)
+            {
+                geom.all_surfaces.ElementAt(surf_index).closed_outer_bndry.boundary_curves.ElementAt(i).is_element_meshed = true;
+            }
+
+            for (int i = 0; i < geom.all_surfaces.ElementAt(surf_index).closed_inner_bndries.Count; i++)
+            {
+                // Set the inner boundary curves
+                for (int j = 0;j< geom.all_surfaces.ElementAt(surf_index).closed_inner_bndries.ElementAt(i).boundary_curves.Count;j++)
+                {
+                    geom.all_surfaces.ElementAt(surf_index).closed_inner_bndries.ElementAt(i).boundary_curves.ElementAt(j).is_element_meshed = true;
+                }
+            }
+
+            // Associate common edges mesh desnsity
+
+
+
+
+            set_edge_datagridview(surf_index);
         }
 
         private void button_delete_Click(object sender, EventArgs e)
         {
+            // Delete mesh of the surface (if exist)
+            // Get the surface index
+            int surf_index = 0;
+            foreach (surface_store surf in geom.all_surfaces)
+            {
+                if (this.selected_surf_id == surf.surf_id)
+                {
+                    break;
+                }
+                surf_index++;
+            }
 
+            // Set the mesh edges  is_meshed = true
+            for (int i = 0; i < geom.all_surfaces.ElementAt(surf_index).closed_outer_bndry.boundary_curves.Count; i++)
+            {
+                geom.all_surfaces.ElementAt(surf_index).closed_outer_bndry.boundary_curves.ElementAt(i).is_element_meshed = true;
+            }
+
+            for (int i = 0; i < geom.all_surfaces.ElementAt(surf_index).closed_inner_bndries.Count; i++)
+            {
+                // Set the inner boundary curves
+                for (int j = 0; j < geom.all_surfaces.ElementAt(surf_index).closed_inner_bndries.ElementAt(i).boundary_curves.Count; j++)
+                {
+                    geom.all_surfaces.ElementAt(surf_index).closed_inner_bndries.ElementAt(i).boundary_curves.ElementAt(j).is_element_meshed = true;
+                }
+            }
         }
 
         private void button_keep_Click(object sender, EventArgs e)
         {
+            // Do nothing and exit
 
         }
 

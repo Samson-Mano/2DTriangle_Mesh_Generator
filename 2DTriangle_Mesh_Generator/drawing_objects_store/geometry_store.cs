@@ -15,7 +15,11 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store
 
         public Label_list_store all_labels { get; private set; }
 
+        public meshdata_store mesh_data { get; private set; }
+
         public bool is_geometry_set { get; private set; }
+
+        public bool is_mesh_set { get; private set; }
 
         public double geom_bound_width { get; private set; }
 
@@ -35,8 +39,15 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store
             all_labels = new Label_list_store();
             all_labels = tlabel_list;
 
+            is_mesh_set = false;
             // Fit the boundary
             fit_the_boundary();
+        }
+
+        public void implement_mesh(mesh_control.mesh_result i_mesh_result)
+        {
+            mesh_data = new meshdata_store(i_mesh_result);
+            is_mesh_set = true;
         }
 
         private void fit_the_boundary()
@@ -81,6 +92,12 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store
             this.is_geometry_set = true;
         }
 
+        public void set_openTK_mesh_objects()
+        {
+            mesh_data.set_openTK_objects();
+        }
+
+
         public void paint_geometry()
         {
             if (this.is_geometry_set == true)
@@ -94,6 +111,11 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store
                 foreach (ellipse_store ellipse in this.all_endpoints)
                 {
                     ellipse.paint_ellipse();
+                }
+
+                if(is_mesh_set == true)
+                {
+                    mesh_data.paint_mesh();
                 }
 
             }

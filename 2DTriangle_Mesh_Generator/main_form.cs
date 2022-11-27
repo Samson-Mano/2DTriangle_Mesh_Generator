@@ -35,6 +35,9 @@ namespace _2DTriangle_Mesh_Generator
 
         mesh_control.mesh_form mesh_form1;
 
+        // Mesh result store
+        private mesh_control.mesh_result mesh_result_store = new mesh_control.mesh_result();
+
         // Cursor point on the GLControl
         private PointF click_pt;
 
@@ -59,7 +62,7 @@ namespace _2DTriangle_Mesh_Generator
         private void importGeometryToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // Import Geometry
-            
+
             OpenFileDialog ow = new OpenFileDialog();
             ow.DefaultExt = "*.txt";
             ow.Filter = "Samson Mano's Varai2D raw data - txt Files (*.txt)|*.txt";
@@ -75,7 +78,7 @@ namespace _2DTriangle_Mesh_Generator
                 {
                     // Re-initialize the geometry
                     geom_obj = new geometry_store();
-                    geom_obj.add_geometry(surf_conv.all_surface, surf_conv.all_ellipses,surf_conv.all_labels,surf_conv.dr_scale,surf_conv.dr_tx,surf_conv.dr_ty);
+                    geom_obj.add_geometry(surf_conv.all_surface, surf_conv.all_ellipses, surf_conv.all_labels, surf_conv.dr_scale, surf_conv.dr_tx, surf_conv.dr_ty);
                     geom_obj.set_openTK_objects();
 
                     is_model_loaded = true;
@@ -88,6 +91,9 @@ namespace _2DTriangle_Mesh_Generator
 
                     toolStripStatusLabel_zoom_value.Text = "Zoom: " + (gvariables_static.RoundOff((int)(1.0f * 100))).ToString() + "%";
 
+                    // Clear previous mesh
+                    this.mesh_result_store = new mesh_control.mesh_result();
+
                     glControl_main_panel.Invalidate();
                 }
             }
@@ -99,7 +105,7 @@ namespace _2DTriangle_Mesh_Generator
             // Create mesh
             if (is_model_loaded == true)
             {
-                mesh_form1 = new mesh_control.mesh_form(geom_obj,this);
+                mesh_form1 = new mesh_control.mesh_form(geom_obj, this);
                 mesh_form1.ShowInTaskbar = false;
                 mesh_form1.StartPosition = FormStartPosition.CenterParent;
                 mesh_form1.Opacity = 0.9;
@@ -119,11 +125,37 @@ namespace _2DTriangle_Mesh_Generator
             glControl_main_panel.Invalidate();
         }
 
-        public void highlight_selected_edge(int surf_id,int edge_id)
+        public void highlight_selected_edge(int surf_id, int edge_id)
         {
             // Edge selection changed from mesh form
             geom_obj.set_edge_highlight_openTK_objects(surf_id, edge_id);
-            
+
+            // Refresh the controller
+            glControl_main_panel.Invalidate();
+        }
+
+        public void update_mesh_data(mesh_control.constrained_delaunay_triangulation.mesh_store i_mesh_data, bool is_add)
+        {
+            // Store the mesh data from mesh form
+            if (is_add == true)
+            {
+                this.mesh_result_store.add_mesh(i_mesh_data.all_points.ToHashSet(),
+    i_mesh_data.all_edges.ToHashSet(),
+    i_mesh_data.all_triangles.ToHashSet());
+            }
+            else
+            {
+                this.mesh_result_store.remove_mesh(i_mesh_data.all_points.ToHashSet(),
+i_mesh_data.all_edges.ToHashSet(),
+i_mesh_data.all_triangles.ToHashSet());
+            }
+
+            // Add mesh data
+            geom_obj.implement_mesh(this.mesh_result_store);
+
+            // Set mesh openTK objects
+            geom_obj.set_openTK_mesh_objects();
+
             // Refresh the controller
             glControl_main_panel.Invalidate();
         }
@@ -143,7 +175,7 @@ namespace _2DTriangle_Mesh_Generator
 
             // Update the size of the drawing area
             g_control.update_drawing_area_size(glControl_main_panel.Width,
-                glControl_main_panel.Height,2.0,2.0);
+                glControl_main_panel.Height, 2.0, 2.0);
 
             // Refresh the controller (doesnt do much.. nothing to draw)
             glControl_main_panel.Invalidate();

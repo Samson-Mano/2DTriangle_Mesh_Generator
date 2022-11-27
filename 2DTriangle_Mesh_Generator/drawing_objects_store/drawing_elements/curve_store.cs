@@ -27,6 +27,10 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
         public HashSet<ellipse_store> curve_element_density_nodes { get; private set; }
 
+        public HashSet<point_store> curve_element_density_pts { get; private set; }
+
+        public bool is_element_meshed { get; set; }
+
         public curve_types_enum curve_type { get; private set; }
 
         public Color curve_color { get; private set; }
@@ -80,6 +84,9 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
             // Add curve length
             this.curve_length = get_c_length();
+
+            // Is meshed
+            this.is_element_meshed = false;
         }
 
         public double get_c_length()
@@ -140,25 +147,37 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
         public void set_curve_elementdensity(double min_element_length)
         {
-            double elem_wd = this.curve_length / min_element_length;
-            this.curve_element_density = (int)Math.Ceiling(Math.Round(elem_wd));
+            if(is_element_meshed == false)
+            {
+                double elem_wd = this.curve_length / min_element_length;
+                this.curve_element_density = (int)Math.Ceiling(Math.Round(elem_wd));
 
-            // Set the element density ellipse (to indicate the element density)
-            set_curve_elementdensity_ellipse();
+                // Set the element density ellipse (to indicate the element density)
+                set_curve_elementdensity_ellipse();
+            }
         }
 
-        public void set_curve_elementdensity(int t_element_density)
+        public bool set_curve_elementdensity(int t_element_density)
         {
-            this.curve_element_density = t_element_density;
+            if (is_element_meshed == false)
+            {
+                this.curve_element_density = t_element_density;
 
-            // Set the element density ellipse (to indicate the element density)
-            set_curve_elementdensity_ellipse();
+                // Set the element density ellipse (to indicate the element density)
+                set_curve_elementdensity_ellipse();
+
+                return false;
+            }
+
+            return true;
         }
 
         public void set_curve_elementdensity_ellipse()
         {
             // Set the curve element density lines
             curve_element_density_nodes = new HashSet<ellipse_store>();
+            curve_element_density_pts = new HashSet<point_store>();
+
             int e_id = 0;
 
             for (int i = 1; i < this.curve_element_density; i++)
@@ -171,6 +190,9 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
                 pt_x = pt_at_param_t.Item1;
                 pt_y = pt_at_param_t.Item2;
+
+                // Add to the point list
+                curve_element_density_pts.Add(new point_store(-100, pt_x, pt_y,Color.Empty));
 
                 curve_element_density_nodes.Add(new ellipse_store(e_id, pt_x, pt_y,
                     global_variables.gvariables_static.drawing_scale,
@@ -214,7 +236,14 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
 
             // Is element meshed
-            curve_data.Add("false");
+            if( is_element_meshed == false)
+            {
+                curve_data.Add("false");
+            }
+            else
+            {
+                curve_data.Add("true"); 
+            }
 
             // Element type
             curve_data.Add(curve_type.ToString());

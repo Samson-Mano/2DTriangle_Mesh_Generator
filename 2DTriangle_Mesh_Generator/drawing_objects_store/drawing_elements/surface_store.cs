@@ -165,7 +165,7 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             }
         }
 
-        public void set_curve_element_density(int t_curve_id,int element_density)
+        public bool set_curve_element_density(int t_curve_id,int element_density)
         {
             // Closed outter boundary curve element length
             int i = 0;
@@ -173,8 +173,7 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             {
                 if(closed_outer_bndry.boundary_curves.ElementAt(i).curve_id == t_curve_id)
                 {
-                    closed_outer_bndry.boundary_curves.ElementAt(i).set_curve_elementdensity(element_density);
-                    return;
+                  return  closed_outer_bndry.boundary_curves.ElementAt(i).set_curve_elementdensity(element_density);
                 }
             }
 
@@ -186,10 +185,12 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
                 {
                     if (closed_inner_bndries.ElementAt(j).boundary_curves.ElementAt(i).curve_id == t_curve_id)
                     {
-                        closed_inner_bndries.ElementAt(j).boundary_curves.ElementAt(i).set_curve_elementdensity(element_density);
+                      return  closed_inner_bndries.ElementAt(j).boundary_curves.ElementAt(i).set_curve_elementdensity(element_density);
                     }
                 }
             }
+
+            return true;
         }
 
         public List<string> get_surface_data()

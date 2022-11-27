@@ -73,6 +73,7 @@
     <Compile Include="drawing_objects_store\drawing_elements\Label_list_store.cs" />
     <Compile Include="drawing_objects_store\drawing_elements\lines_list_store.cs" />
     <Compile Include="drawing_objects_store\drawing_elements\line_store.cs" />
+    <Compile Include="drawing_objects_store\drawing_elements\meshdata_store.cs" />
     <Compile Include="drawing_objects_store\drawing_elements\points_list_store.cs" />
     <Compile Include="drawing_objects_store\drawing_elements\point_store.cs" />
     <Compile Include="drawing_objects_store\drawing_elements\surface_store.cs" />
@@ -86,12 +87,14 @@
     <Compile Include="main_form.Designer.cs">
       <DependentUpon>main_form.cs</DependentUpon>
     </Compile>
+    <Compile Include="mesh_control\constrained_delaunay_triangulation.cs" />
     <Compile Include="mesh_control\mesh_form.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="mesh_control\mesh_form.Designer.cs">
       <DependentUpon>mesh_form.cs</DependentUpon>
     </Compile>
+    <Compile Include="mesh_control\mesh_result.cs" />
     <Compile Include="opentk_control\opentk_bgdraw\drawing_area_control.cs" />
     <Compile Include="opentk_control\opentk_buffer\IndexBuffer.cs" />
     <Compile Include="opentk_control\opentk_buffer\VertexArray.cs" />
