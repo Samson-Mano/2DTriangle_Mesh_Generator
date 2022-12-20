@@ -253,15 +253,29 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
 
                 // Find and queue bad triangles
                 mesh_store.triangle_store bad_triangle = mesh_data.all_triangles.Find(obj => triangle_angle_size_contstraint(obj, B_var, H_var) == true);
+                int inf_loop_check = 1;
 
                 while (bad_triangle != null)
                 {
+                    if(inf_loop_check>2000000)
+                    {
+                        // Stuck in infinite loop (or too many element count)
+                        break;
+                    }
+
                     mesh_data.Add_single_point(bad_triangle.circum_center);
 
                     bad_triangle = mesh_data.all_triangles.Find(obj => triangle_angle_size_contstraint(obj, B_var, H_var) == true);
+                    inf_loop_check++;
                 }
 
                 // Finalize mesh (by removing super triangles)
+                // remove_super_triangle();
+
+            }
+
+            private void remove_super_triangle()
+            {
                 List<int> remove_index = new List<int>();
 
                 // Remove all the triangles not inside the surface
@@ -309,7 +323,6 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                 {
                     mesh_data.all_points.RemoveAt(i);
                 }
-
             }
 
             private bool triangle_angle_size_contstraint(mesh_store.triangle_store bad_triangle, double Bv, double Hv)
@@ -318,6 +331,7 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                             is_point_in_surface(bad_triangle.shrunk_vertices[1]) == true &&
                             is_point_in_surface(bad_triangle.shrunk_vertices[2]) == true)
                 {
+
                     if (bad_triangle.circumradius_shortest_edge_ratio > Bv)
                     {
                         // condition 1: B parameter => A triangle is well-shaped if all its angles are greater than or equal to 30 degrees
@@ -340,7 +354,6 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                 }
 
             }
-
 
             private bool is_point_in_surface(mesh_store.point_store i_pt)
             {
@@ -433,15 +446,16 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
         }
 
 
-
-
         #region " Delaunay Triangulation - Bowyer Watson Incremental Algorithm"
         public class mesh_store
         {
             // Local Variables
-            private List<point_store> _all_points = new List<point_store>();
-            private List<edge_store> _all_edges = new List<edge_store>();
-            private List<triangle_store> _all_triangles = new List<triangle_store>();
+            public List<point_store> all_points { get; private set; }
+
+            public List<edge_store> all_edges { get; private set; }
+
+            public List<triangle_store> all_triangles { get; private set; }
+
             public bool is_meshed = false;
 
             private List<int> unique_edgeid_list = new List<int>();
@@ -449,21 +463,6 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
 
             // super triangle points
             private point_store s_p1, s_p2, s_p3;
-
-            public List<point_store> all_points
-            {
-                get { return this._all_points; }
-            }
-
-            public List<triangle_store> all_triangles
-            {
-                get { return this._all_triangles; }
-            }
-
-            public List<edge_store> all_edges
-            {
-                get { return this._all_edges; }
-            }
 
             public mesh_store()
             {
@@ -473,21 +472,15 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
             public void Add_multiple_points(List<point_store> p_inpt_points)
             {
                 // Call this first
-                this._all_points = new List<point_store>(p_inpt_points);
-                // Transfer the parent variable to local point_store list
-                //foreach (pslg_datastructure.point2d pt in parent_inpt_points)
-                //{
-                //    this._all_points.Add(new point_store(pt.id, pt.x, pt.y, pt));
-                //}
-
+                this.all_points = new List<point_store>(p_inpt_points);
 
                 // sort the points first by x and then by y
-                this._all_points = this._all_points.OrderBy(obj => obj.x).ThenBy(obj => obj.y).ToList();
+                this.all_points = this.all_points.OrderBy(obj => obj.x).ThenBy(obj => obj.y).ToList();
 
 
                 // intialize the edges and triangles
-                this._all_edges = new List<edge_store>();
-                this._all_triangles = new List<triangle_store>();
+                this.all_edges = new List<edge_store>();
+                this.all_triangles = new List<triangle_store>();
 
                 // Create an imaginary triangle that encloses all the point set
                 set_bounding_triangle(this.all_points);
@@ -495,7 +488,16 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                 foreach (point_store i_pt in this.all_points)
                 {
                     // incemental add point
-                    incremental_point_addition(i_pt);
+                    int containing_triangle_index = this.all_triangles.FindIndex(obj => obj.is_point_inside(i_pt) == true);
+
+                    if (containing_triangle_index != -1)
+                    {
+                        incremental_point_addition_inner(i_pt, containing_triangle_index);
+                    }
+                    else
+                    {
+                        incremental_point_addition_edge(i_pt);
+                    }
                 }
             }
 
@@ -504,10 +506,77 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                 // dont call this before calling Add_multiple_points
                 point_store temp_pt = new point_store(this.all_points.Count, p_onemore_point.x, p_onemore_point.y, 3);
                 // Add the point to local list
-                this._all_points.Add(temp_pt);
+                this.all_points.Add(temp_pt);
 
                 // call the incremental add point
-                incremental_point_addition(this.all_points[this.all_points.Count - 1]);
+                int containing_triangle_index = this.all_triangles.FindIndex(obj => obj.is_point_inside(this.all_points[this.all_points.Count - 1]) == true);
+
+                if (containing_triangle_index != -1)
+                {
+                    incremental_point_addition_inner(this.all_points[this.all_points.Count - 1], containing_triangle_index);
+                }
+                else
+                {
+                    incremental_point_addition_edge(this.all_points[this.all_points.Count - 1]);
+                }
+            }
+
+            private void incremental_point_addition_inner(point_store pt, int containing_triangle_index)
+            {
+                // collect the edges of the triangle
+                edge_store tri_edge_a = this.all_triangles[containing_triangle_index].e1;
+                edge_store tri_edge_b = this.all_triangles[containing_triangle_index].e2;
+                edge_store tri_edge_c = this.all_triangles[containing_triangle_index].e3;
+
+                // remove the single triangle
+                remove_triangle(containing_triangle_index);
+
+                // add the three triangles
+                int[] triangle_id = new int[3];
+                triangle_id = add_three_triangles(pt, tri_edge_a, tri_edge_b, tri_edge_c);
+
+                // Flip the bad triangles recursively
+                flip_bad_edges(triangle_id[0], pt);
+                flip_bad_edges(triangle_id[1], pt);
+                flip_bad_edges(triangle_id[2], pt);
+            }
+
+            private void incremental_point_addition_edge(point_store pt)
+            {
+                // Point lies on the edge
+                // Find the edge which is closest to the pt
+                int the_edge_id = this.all_edges.Find(obj => obj.test_point_on_line(pt)).edge_id;
+
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! <----- Error
+                int first_tri_index = this.all_edges[the_edge_id].left_triangle.tri_id;
+                int second_tri_index = this.all_edges[the_edge_id].right_triangle.tri_id;
+
+                // collect the other two edges of first triangle
+                edge_store[] first_tri_other_two_edge = new edge_store[2];
+                first_tri_other_two_edge = this.all_triangles[first_tri_index].get_other_two_edges(this.all_edges[the_edge_id]);
+
+                // collect the other two edges of second triangle
+                edge_store[] second_tri_other_two_edge = new edge_store[2];
+                second_tri_other_two_edge = this.all_triangles[second_tri_index].get_other_two_edges(this.all_edges[the_edge_id]);
+
+                // Remove the common edge
+                unique_edgeid_list.Add(this.all_edges[the_edge_id].edge_id);
+                // this._all_edges.RemoveAt(the_edge_index);
+                this.all_edges[the_edge_id].remove_edge();
+
+                // remove the two triangle
+                remove_triangle(first_tri_index);
+                remove_triangle(second_tri_index);
+
+                // add the three triangles
+                int[] triangle_id = new int[4];
+                triangle_id = add_four_triangles(pt, first_tri_other_two_edge[0], first_tri_other_two_edge[1], second_tri_other_two_edge[0], second_tri_other_two_edge[1]);
+
+                // Flip the bad triangles recursively
+                flip_bad_edges(triangle_id[0], pt);
+                flip_bad_edges(triangle_id[1], pt);
+                flip_bad_edges(triangle_id[2], pt);
+                flip_bad_edges(triangle_id[3], pt);
             }
 
             private void incremental_point_addition(point_store pt)
@@ -538,8 +607,10 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                 {
                     // Point lies on the edge
                     // Find the edge which is closest to the pt
-                    int the_edge_id = this.all_edges.Find(obj => obj.test_point_on_line(pt)).edge_id;
+                    int the_edge_index = this.all_edges.FindIndex(obj => obj.test_point_on_line(pt));
+                    int the_edge_id = this.all_edges[the_edge_index].edge_id;
 
+                    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! <----- Error
                     int first_tri_index = this.all_edges[the_edge_id].left_triangle.tri_id;
                     int second_tri_index = this.all_edges[the_edge_id].right_triangle.tri_id;
 
@@ -554,7 +625,7 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                     // Remove the common edge
                     unique_edgeid_list.Add(this.all_edges[the_edge_id].edge_id);
                     // this._all_edges.RemoveAt(the_edge_index);
-                    this._all_edges[the_edge_id].remove_edge();
+                    this.all_edges[the_edge_id].remove_edge();
 
                     // remove the two triangle
                     remove_triangle(first_tri_index);
@@ -572,50 +643,6 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                 }
             }
 
-            //public void Finalize_mesh(pslg_datastructure.surface_store the_surface)
-            //{
-            //    // Call this after calling Add_multiple_points & Add_single_point (if required)
-            //    // Finalize mesh is the final step to transfer the mesh from local data to global
-            //    local_output_edges = new List<pslg_datastructure.edge2d>();
-            //    local_output_triangle = new List<pslg_datastructure.triangle2d>();
-
-
-            //    int i = 0;
-            //    foreach (triangle_store the_tri in this.all_triangles)
-            //    {
-            //        // Check if the triangles lies inside the surface
-
-
-            //        if (the_surface.pointinsurface(the_tri.shrunk_vertices[0].x, the_tri.shrunk_vertices[0].y) == false ||
-            //            the_surface.pointinsurface(the_tri.shrunk_vertices[1].x, the_tri.shrunk_vertices[1].y) == false ||
-            //            the_surface.pointinsurface(the_tri.shrunk_vertices[2].x, the_tri.shrunk_vertices[2].y) == false)
-            //        {
-            //            // continue because the face is not in surface
-            //            continue;
-            //        }
-
-            //        pslg_datastructure.triangle2d temp_tri = new pslg_datastructure.triangle2d(i, the_tri.pt1.get_parent_data_type, the_tri.pt2.get_parent_data_type, the_tri.pt3.get_parent_data_type);
-            //        local_output_triangle.Add(temp_tri);
-            //        i++;
-            //    }
-
-            //    i = 0;
-            //    foreach (edge_store the_edge in this.all_edges)
-            //    {
-            //        // Check if the edges lies inside the surface
-            //        pslg_datastructure.edge2d temp_edge = new pslg_datastructure.edge2d(i, the_edge.start_pt.get_parent_data_type, the_edge.end_pt.get_parent_data_type);
-
-            //        if (local_output_triangle.Exists(obj => obj.edge_exists(temp_edge) == true)) //so check whether this edge is associated with a face
-            //        {
-            //            local_output_edges.Add(temp_edge);
-            //            i++;
-            //        }
-            //    }
-
-            //    // set the mesh complete
-            //    is_meshed = true;
-            //}
-
             private void remove_triangle(int tri_index)
             {
                 int edge_index1 = this.all_triangles[tri_index].e1.edge_id;
@@ -625,21 +652,21 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                 // Edge 1
                 if (edge_index1 != -1)
                 {
-                    this._all_edges[edge_index1].remove_triangle(this.all_triangles[tri_index]);
+                    this.all_edges[edge_index1].remove_triangle(this.all_triangles[tri_index]);
                 }
                 // Edge 2
                 if (edge_index2 != -1)
                 {
-                    this._all_edges[edge_index2].remove_triangle(this.all_triangles[tri_index]);
+                    this.all_edges[edge_index2].remove_triangle(this.all_triangles[tri_index]);
                 }
                 // Edge 3
                 if (edge_index3 != -1)
                 {
-                    this._all_edges[edge_index3].remove_triangle(this.all_triangles[tri_index]);
+                    this.all_edges[edge_index3].remove_triangle(this.all_triangles[tri_index]);
                 }
 
                 unique_triangleid_list.Add(this.all_triangles[tri_index].tri_id);
-                this._all_triangles[tri_index].remove_triangle();
+                this.all_triangles[tri_index].remove_triangle();
             }
 
             public int[] add_three_triangles(point_store new_pt, edge_store edge_a, edge_store edge_b, edge_store edge_c)
@@ -670,21 +697,21 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
 
                 // Add the triangle details to the edge
                 // Edge 1
-                this._all_edges[edge_indices[0]].add_triangle(this.all_triangles[output_indices[0]]);
-                this._all_edges[edge_indices[0]].add_triangle(this.all_triangles[output_indices[2]]);
+                this.all_edges[edge_indices[0]].add_triangle(this.all_triangles[output_indices[0]]);
+                this.all_edges[edge_indices[0]].add_triangle(this.all_triangles[output_indices[2]]);
                 // Edge 2
-                this._all_edges[edge_indices[1]].add_triangle(this.all_triangles[output_indices[0]]);
-                this._all_edges[edge_indices[1]].add_triangle(this.all_triangles[output_indices[1]]);
+                this.all_edges[edge_indices[1]].add_triangle(this.all_triangles[output_indices[0]]);
+                this.all_edges[edge_indices[1]].add_triangle(this.all_triangles[output_indices[1]]);
                 // Edge 3
-                this._all_edges[edge_indices[2]].add_triangle(this.all_triangles[output_indices[1]]);
-                this._all_edges[edge_indices[2]].add_triangle(this.all_triangles[output_indices[2]]);
+                this.all_edges[edge_indices[2]].add_triangle(this.all_triangles[output_indices[1]]);
+                this.all_edges[edge_indices[2]].add_triangle(this.all_triangles[output_indices[2]]);
 
                 // Edge a
-                this._all_edges[edge_a.edge_id].add_triangle(this.all_triangles[output_indices[0]]);
+                this.all_edges[edge_a.edge_id].add_triangle(this.all_triangles[output_indices[0]]);
                 // Edge b
-                this._all_edges[edge_b.edge_id].add_triangle(this.all_triangles[output_indices[1]]);
+                this.all_edges[edge_b.edge_id].add_triangle(this.all_triangles[output_indices[1]]);
                 // Edge c
-                this._all_edges[edge_c.edge_id].add_triangle(this.all_triangles[output_indices[2]]);
+                this.all_edges[edge_c.edge_id].add_triangle(this.all_triangles[output_indices[2]]);
 
                 //_________________________________________________________________________________
 
@@ -725,26 +752,26 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
 
                 // Add the triangle details to the edge
                 // Edge 1
-                this._all_edges[edge_indices[0]].add_triangle(this.all_triangles[output_indices[0]]);
-                this._all_edges[edge_indices[0]].add_triangle(this.all_triangles[output_indices[3]]);
+                this.all_edges[edge_indices[0]].add_triangle(this.all_triangles[output_indices[0]]);
+                this.all_edges[edge_indices[0]].add_triangle(this.all_triangles[output_indices[3]]);
                 // Edge 2
-                this._all_edges[edge_indices[1]].add_triangle(this.all_triangles[output_indices[0]]);
-                this._all_edges[edge_indices[1]].add_triangle(this.all_triangles[output_indices[1]]);
+                this.all_edges[edge_indices[1]].add_triangle(this.all_triangles[output_indices[0]]);
+                this.all_edges[edge_indices[1]].add_triangle(this.all_triangles[output_indices[1]]);
                 // Edge 3
-                this._all_edges[edge_indices[2]].add_triangle(this.all_triangles[output_indices[1]]);
-                this._all_edges[edge_indices[2]].add_triangle(this.all_triangles[output_indices[2]]);
+                this.all_edges[edge_indices[2]].add_triangle(this.all_triangles[output_indices[1]]);
+                this.all_edges[edge_indices[2]].add_triangle(this.all_triangles[output_indices[2]]);
                 // Edge 4
-                this._all_edges[edge_indices[3]].add_triangle(this.all_triangles[output_indices[2]]);
-                this._all_edges[edge_indices[3]].add_triangle(this.all_triangles[output_indices[3]]);
+                this.all_edges[edge_indices[3]].add_triangle(this.all_triangles[output_indices[2]]);
+                this.all_edges[edge_indices[3]].add_triangle(this.all_triangles[output_indices[3]]);
 
                 // Edge a
-                this._all_edges[edge_a.edge_id].add_triangle(this.all_triangles[output_indices[0]]);
+                this.all_edges[edge_a.edge_id].add_triangle(this.all_triangles[output_indices[0]]);
                 // Edge b
-                this._all_edges[edge_b.edge_id].add_triangle(this.all_triangles[output_indices[1]]);
+                this.all_edges[edge_b.edge_id].add_triangle(this.all_triangles[output_indices[1]]);
                 // Edge c
-                this._all_edges[edge_c.edge_id].add_triangle(this.all_triangles[output_indices[2]]);
+                this.all_edges[edge_c.edge_id].add_triangle(this.all_triangles[output_indices[2]]);
                 // Edge d
-                this._all_edges[edge_d.edge_id].add_triangle(this.all_triangles[output_indices[3]]);
+                this.all_edges[edge_d.edge_id].add_triangle(this.all_triangles[output_indices[3]]);
                 //_________________________________________________________________________________
 
                 return output_indices;
@@ -769,15 +796,15 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
 
                 // Add the triangle details to the edge
                 // Common Edge
-                this._all_edges[edge_index].add_triangle(this.all_triangles[output_indices[0]]);
-                this._all_edges[edge_index].add_triangle(this.all_triangles[output_indices[1]]);
+                this.all_edges[edge_index].add_triangle(this.all_triangles[output_indices[0]]);
+                this.all_edges[edge_index].add_triangle(this.all_triangles[output_indices[1]]);
 
                 // Edge a
-                this._all_edges[tri_a_edge_1.edge_id].add_triangle(this.all_triangles[output_indices[0]]);
-                this._all_edges[tri_b_edge_0.edge_id].add_triangle(this.all_triangles[output_indices[0]]);
+                this.all_edges[tri_a_edge_1.edge_id].add_triangle(this.all_triangles[output_indices[0]]);
+                this.all_edges[tri_b_edge_0.edge_id].add_triangle(this.all_triangles[output_indices[0]]);
                 // Edge b
-                this._all_edges[tri_b_edge_1.edge_id].add_triangle(this.all_triangles[output_indices[1]]);
-                this._all_edges[tri_a_edge_0.edge_id].add_triangle(this.all_triangles[output_indices[1]]);
+                this.all_edges[tri_b_edge_1.edge_id].add_triangle(this.all_triangles[output_indices[1]]);
+                this.all_edges[tri_a_edge_0.edge_id].add_triangle(this.all_triangles[output_indices[1]]);
                 //_________________________________________________________________________________
 
                 return output_indices;
@@ -792,12 +819,12 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                     // new edge is added
                     edge_store temp_edge = new edge_store();
                     temp_edge.add_edge(edge_index, pt1, pt2);
-                    this._all_edges.Add(temp_edge);
+                    this.all_edges.Add(temp_edge);
                 }
                 else
                 {
                     // existing edge is revised (previously deleted edge is now filled)
-                    this._all_edges[edge_index].add_edge(edge_index, pt1, pt2);
+                    this.all_edges[edge_index].add_edge(edge_index, pt1, pt2);
                 }
                 return edge_index;
             }
@@ -811,12 +838,12 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                     // new triangle is added
                     triangle_store temp_tri = new triangle_store();
                     temp_tri.add_triangle(tri_index, pt1, pt2, pt3, e1, e2, e3);
-                    this._all_triangles.Add(temp_tri);
+                    this.all_triangles.Add(temp_tri);
                 }
                 else
                 {
                     // existing triangle is revised (previously deleted triangle is now filled)
-                    this._all_triangles[tri_index].add_triangle(tri_index, pt1, pt2, pt3, e1, e2, e3);
+                    this.all_triangles[tri_index].add_triangle(tri_index, pt1, pt2, pt3, e1, e2, e3);
                 }
                 return tri_index;
             }
@@ -859,7 +886,7 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                         // Remove the common edge
                         unique_edgeid_list.Add(this.all_edges[common_edge_index].edge_id);
                         // this._all_edges.RemoveAt(common_edge_index);
-                        this._all_edges[common_edge_index].remove_edge();
+                        this.all_edges[common_edge_index].remove_edge();
 
                         // Remove the two triangles
                         remove_triangle(tri_index);
@@ -964,6 +991,7 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
             public class point_store
             {
                 public int pt_id { get; private set; }
+
                 public double x { get; private set; }
 
                 public double y { get; private set; }
@@ -1021,6 +1049,11 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                 public point_store mult(double v)
                 {
                     return (new point_store(this.pt_id, this.x * v, this.y * v, 3));
+                }
+
+                public override int GetHashCode()
+                {
+                    return this.pt_id.GetHashCode();
                 }
 
             }
@@ -1217,8 +1250,7 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                     }
                     return false;
                 }
-
-
+    
                 public bool test_point_on_line(point_store pt)
                 {
                     bool rslt = false;
@@ -1288,9 +1320,11 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                     return null;
                 }
 
-
+                public override int GetHashCode()
+                {
+                    return HashCode.Combine(edge_id);
+                }
             }
-
             public class triangle_store
             {
                 public int tri_id { get; private set; }
@@ -1309,7 +1343,6 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
 
                 double _circum_circle_radius;
                 double _shortest_edge;
-
 
                 public point_store[] shrunk_vertices { get; } = new point_store[3];
 
@@ -1415,6 +1448,10 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
 
                 private void set_shortest_edge()
                 {
+                    //double edge_len_1 = (e1.is_fixed_edge == false ? e1.edge_length : Double.MaxValue);
+                    //double edge_len_2 =(e2.is_fixed_edge == false? e2.edge_length:Double.MaxValue);
+                    //double edge_len_3 = (e3.is_fixed_edge == false ? e3.edge_length : Double.MaxValue);
+
                     double edge_len_1 = e1.edge_length;
                     double edge_len_2 = e2.edge_length;
                     double edge_len_3 = e3.edge_length;
@@ -1611,6 +1648,11 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                         return true;
                     }
                     return false;
+                }
+
+                public override int GetHashCode()
+                {
+                    return HashCode.Combine(tri_id);
                 }
             }
         }

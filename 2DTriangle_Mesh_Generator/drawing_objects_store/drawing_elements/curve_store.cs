@@ -29,7 +29,7 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
         public HashSet<point_store> curve_element_density_pts { get; private set; }
 
-        public bool is_element_meshed { get; set; }
+        public bool is_curve_meshed { get; set; }
 
         public curve_types_enum curve_type { get; private set; }
 
@@ -86,7 +86,7 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             this.curve_length = get_c_length();
 
             // Is meshed
-            this.is_element_meshed = false;
+            this.is_curve_meshed = false;
         }
 
         public double get_c_length()
@@ -147,7 +147,7 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
         public void set_curve_elementdensity(double min_element_length)
         {
-            if(is_element_meshed == false)
+            if(is_curve_meshed == false)
             {
                 double elem_wd = this.curve_length / min_element_length;
                 this.curve_element_density = (int)Math.Ceiling(Math.Round(elem_wd));
@@ -159,7 +159,7 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
         public bool set_curve_elementdensity(int t_element_density)
         {
-            if (is_element_meshed == false)
+            if (is_curve_meshed == false)
             {
                 this.curve_element_density = t_element_density;
 
@@ -236,7 +236,7 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
 
             // Is element meshed
-            if( is_element_meshed == false)
+            if(is_curve_meshed == false)
             {
                 curve_data.Add("false");
             }

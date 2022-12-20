@@ -87,7 +87,17 @@
     <Compile Include="main_form.Designer.cs">
       <DependentUpon>main_form.cs</DependentUpon>
     </Compile>
+    <Compile Include="mesh_control\constrained_delaunay_triangle_main.cs" />
     <Compile Include="mesh_control\constrained_delaunay_triangulation.cs" />
+    <Compile Include="mesh_control\delaunay_triangulation\delaunay_triangulation.cs" />
+    <Compile Include="mesh_control\delaunay_triangulation\edge_list_store.cs" />
+    <Compile Include="mesh_control\delaunay_triangulation\edge_store.cs" />
+    <Compile Include="mesh_control\delaunay_triangulation\mesh_store.cs" />
+    <Compile Include="mesh_control\delaunay_triangulation\point_d.cs" />
+    <Compile Include="mesh_control\delaunay_triangulation\point_list_store.cs" />
+    <Compile Include="mesh_control\delaunay_triangulation\point_store.cs" />
+    <Compile Include="mesh_control\delaunay_triangulation\triangle_list_store.cs" />
+    <Compile Include="mesh_control\delaunay_triangulation\triangle_store.cs" />
     <Compile Include="mesh_control\mesh_form.cs">
       <SubType>Form</SubType>
     </Compile>

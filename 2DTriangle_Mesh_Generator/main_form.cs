@@ -18,7 +18,7 @@ using _2DTriangle_Mesh_Generator.opentk_control;
 using _2DTriangle_Mesh_Generator.global_variables;
 using _2DTriangle_Mesh_Generator.txt_input_reader;
 using _2DTriangle_Mesh_Generator.drawing_objects_store;
-
+using _2DTriangle_Mesh_Generator.mesh_control.delaunay_triangulation;
 
 namespace _2DTriangle_Mesh_Generator
 {
@@ -36,7 +36,7 @@ namespace _2DTriangle_Mesh_Generator
         mesh_control.mesh_form mesh_form1;
 
         // Mesh result store
-        private mesh_control.mesh_result mesh_result_store = new mesh_control.mesh_result();
+        private List<mesh_control.mesh_result> mesh_result_store = new List<mesh_control.mesh_result>();
 
         // Cursor point on the GLControl
         private PointF click_pt;
@@ -92,7 +92,7 @@ namespace _2DTriangle_Mesh_Generator
                     toolStripStatusLabel_zoom_value.Text = "Zoom: " + (gvariables_static.RoundOff((int)(1.0f * 100))).ToString() + "%";
 
                     // Clear previous mesh
-                    this.mesh_result_store = new mesh_control.mesh_result();
+                    this.mesh_result_store = new List<mesh_control.mesh_result>();
 
                     glControl_main_panel.Invalidate();
                 }
@@ -134,21 +134,31 @@ namespace _2DTriangle_Mesh_Generator
             glControl_main_panel.Invalidate();
         }
 
-        public void update_mesh_data(mesh_control.constrained_delaunay_triangulation.mesh_store i_mesh_data, bool is_add)
+        public void add_mesh_data(int surf_id,mesh_store i_mesh_data)
         {
             // Store the mesh data from mesh form
-            if (is_add == true)
-            {
-                this.mesh_result_store.add_mesh(i_mesh_data.all_points.ToHashSet(),
-    i_mesh_data.all_edges.ToHashSet(),
-    i_mesh_data.all_triangles.ToHashSet());
-            }
-            else
-            {
-                this.mesh_result_store.remove_mesh(i_mesh_data.all_points.ToHashSet(),
-i_mesh_data.all_edges.ToHashSet(),
-i_mesh_data.all_triangles.ToHashSet());
-            }
+
+                this.mesh_result_store.Add(new mesh_control.mesh_result(surf_id,  i_mesh_data.result_pts_data,
+    i_mesh_data.result_edge_data,
+    i_mesh_data.result_tri_data));
+          
+            // Add mesh data
+            geom_obj.implement_mesh(this.mesh_result_store);
+
+            // Set mesh openTK objects
+            geom_obj.set_openTK_mesh_objects();
+
+            // Refresh the controller
+            glControl_main_panel.Invalidate();
+        }
+
+        public void delete_mesh_data(int surf_id)
+        {
+            // Store the mesh data from mesh form
+            int remove_index;
+            remove_index= this.mesh_result_store.FindIndex(obj => obj.mesh_surf_id == surf_id);
+
+            this.mesh_result_store.RemoveAt(remove_index);  
 
             // Add mesh data
             geom_obj.implement_mesh(this.mesh_result_store);

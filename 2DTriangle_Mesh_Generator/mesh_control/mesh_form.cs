@@ -402,12 +402,14 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                 mesh_inpt = mesh_inpt + "END" + Environment.NewLine;
             }
 
-            constrained_delaunay_triangulation CDT = new constrained_delaunay_triangulation(mesh_inpt);
+            // global_variables.gvariables_static.Show_error_Dialog("Mesh output", mesh_inpt);
+
+            constrained_delaunay_triangle_main CDT = new constrained_delaunay_triangle_main(mesh_inpt);
 
             // Get the mesh
             if (CDT.is_surface_read == true)
             {
-                this.parent_form.update_mesh_data(CDT.input_surface.mesh_data,true);
+                this.parent_form.add_mesh_data(surf_index, CDT.input_surface.mesh_data);
             }
 
 
@@ -415,20 +417,17 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
             // Set the mesh edges  is_meshed = true
             for (int i = 0; i < geom.all_surfaces.ElementAt(surf_index).closed_outer_bndry.boundary_curves.Count; i++)
             {
-                geom.all_surfaces.ElementAt(surf_index).closed_outer_bndry.boundary_curves.ElementAt(i).is_element_meshed = true;
+                geom.all_surfaces.ElementAt(surf_index).closed_outer_bndry.boundary_curves.ElementAt(i).is_curve_meshed = true;
             }
 
             for (int i = 0; i < geom.all_surfaces.ElementAt(surf_index).closed_inner_bndries.Count; i++)
             {
                 // Set the inner boundary curves
-                for (int j = 0;j< geom.all_surfaces.ElementAt(surf_index).closed_inner_bndries.ElementAt(i).boundary_curves.Count;j++)
+                for (int j = 0; j < geom.all_surfaces.ElementAt(surf_index).closed_inner_bndries.ElementAt(i).boundary_curves.Count; j++)
                 {
-                    geom.all_surfaces.ElementAt(surf_index).closed_inner_bndries.ElementAt(i).boundary_curves.ElementAt(j).is_element_meshed = true;
+                    geom.all_surfaces.ElementAt(surf_index).closed_inner_bndries.ElementAt(i).boundary_curves.ElementAt(j).is_curve_meshed = true;
                 }
             }
-
-            // Associate common edges mesh desnsity
-
 
 
 
@@ -449,10 +448,12 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                 surf_index++;
             }
 
+            this.parent_form.delete_mesh_data(surf_index);
+
             // Set the mesh edges  is_meshed = true
             for (int i = 0; i < geom.all_surfaces.ElementAt(surf_index).closed_outer_bndry.boundary_curves.Count; i++)
             {
-                geom.all_surfaces.ElementAt(surf_index).closed_outer_bndry.boundary_curves.ElementAt(i).is_element_meshed = true;
+                geom.all_surfaces.ElementAt(surf_index).closed_outer_bndry.boundary_curves.ElementAt(i).is_curve_meshed = false;
             }
 
             for (int i = 0; i < geom.all_surfaces.ElementAt(surf_index).closed_inner_bndries.Count; i++)
@@ -460,9 +461,11 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                 // Set the inner boundary curves
                 for (int j = 0; j < geom.all_surfaces.ElementAt(surf_index).closed_inner_bndries.ElementAt(i).boundary_curves.Count; j++)
                 {
-                    geom.all_surfaces.ElementAt(surf_index).closed_inner_bndries.ElementAt(i).boundary_curves.ElementAt(j).is_element_meshed = true;
+                    geom.all_surfaces.ElementAt(surf_index).closed_inner_bndries.ElementAt(i).boundary_curves.ElementAt(j).is_curve_meshed = false;
                 }
             }
+
+            set_edge_datagridview(surf_index);
         }
 
         private void button_keep_Click(object sender, EventArgs e)

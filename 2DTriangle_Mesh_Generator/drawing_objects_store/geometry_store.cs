@@ -4,6 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements;
+// OpenTK library
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL4;
+using OpenTK.Input;
 
 namespace _2DTriangle_Mesh_Generator.drawing_objects_store
 {
@@ -44,8 +49,12 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store
             fit_the_boundary();
         }
 
-        public void implement_mesh(mesh_control.mesh_result i_mesh_result)
+        public void implement_mesh(List<mesh_control.mesh_result> i_mesh_result)
         {
+            foreach(mesh_control.mesh_result m in i_mesh_result)
+            {
+
+            }
             mesh_data = new meshdata_store(i_mesh_result);
             is_mesh_set = true;
         }
@@ -102,6 +111,14 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store
         {
             if (this.is_geometry_set == true)
             {
+
+                if (is_mesh_set == true)
+                {
+                    GL.LineWidth(1.02f);
+                    GL.PointSize(3.02f);
+                    mesh_data.paint_mesh();
+                }
+
                 // Paint the surface boundaries
                 foreach (surface_store surf in this.all_surfaces)
                 {
@@ -111,11 +128,6 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store
                 foreach (ellipse_store ellipse in this.all_endpoints)
                 {
                     ellipse.paint_ellipse();
-                }
-
-                if(is_mesh_set == true)
-                {
-                    mesh_data.paint_mesh();
                 }
 
             }
