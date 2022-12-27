@@ -52,6 +52,25 @@ namespace _2DTriangle_Mesh_Generator.mesh_control.delaunay_triangulation
             return point_id;
         }
 
+        public int get_boundary_point_id(point_d pt_coord)
+        {
+            // Returns only the boundary points (pt_type 1 & 2)
+            foreach(point_store pt in get_all_points())
+            {
+                // Skip the inner points
+                if (pt.pt_type == 3)
+                    continue;
+                
+                // If point type is 1 or 2 then check the coordinate match
+                if(pt.Equals(pt_coord)==true)
+                {
+                    return pt.pt_id;
+                }
+            }
+
+            // none found (this should never trigger)
+            return -1;
+        }
 
         public List<point_store> get_all_points()
         {

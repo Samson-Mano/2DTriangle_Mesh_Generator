@@ -51,10 +51,10 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store
 
         public void implement_mesh(List<mesh_control.mesh_result> i_mesh_result)
         {
-            foreach(mesh_control.mesh_result m in i_mesh_result)
-            {
+            //foreach(mesh_control.mesh_result m in i_mesh_result)
+            //{
 
-            }
+            //}
             mesh_data = new meshdata_store(i_mesh_result);
             is_mesh_set = true;
         }
@@ -111,15 +111,7 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store
         {
             if (this.is_geometry_set == true)
             {
-
-                if (is_mesh_set == true)
-                {
-                    GL.LineWidth(1.02f);
-                    GL.PointSize(3.02f);
-                    mesh_data.paint_mesh();
-                }
-
-                // Paint the surface boundaries
+                                // Paint the surface boundaries
                 foreach (surface_store surf in this.all_surfaces)
                 {
                     surf.paint_boundaries();
@@ -130,6 +122,12 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store
                     ellipse.paint_ellipse();
                 }
 
+                if (is_mesh_set == true)
+                {
+                    GL.LineWidth(1.02f);
+                    GL.PointSize(3.02f);
+                    mesh_data.paint_mesh();
+                }
             }
         }
 

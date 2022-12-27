@@ -34,12 +34,12 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
             // Assign random color for mesh
             Random r = new Random();
             int color_code = r.Next(0, 69);
+
             edge_color = global_variables.gvariables_static.standard_colors[color_code];
 
             tri_color = Color.FromArgb(50, edge_color);
 
             point_color = Color.FromArgb(100, edge_color);
-
         }
 
         //public void add_mesh()

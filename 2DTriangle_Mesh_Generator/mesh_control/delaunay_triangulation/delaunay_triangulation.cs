@@ -214,25 +214,25 @@ namespace _2DTriangle_Mesh_Generator.mesh_control.delaunay_triangulation
             point_store pt1 = points_data.get_point(tri_corner_four_pts[0]);
             double edge_len_1 = get_edge_length(new_pt.pt_coord, pt1.pt_coord);
             point_d mid_pt_1 = get_edge_midpt(new_pt.pt_coord, pt1.pt_coord);
-            edge_indices[0] = edges_data.add_edge(new_pt.pt_id, pt1.pt_id, mid_pt_1, edge_len_1);
+            edge_indices[0] = edges_data.add_edge(new_pt.pt_id, pt1.pt_id, mid_pt_1, edge_len_1, is_boundary_edge(new_pt.pt_id, pt1.pt_id));
 
             // Add Edge 2
             point_store pt2 = points_data.get_point(tri_corner_four_pts[1]);
             double edge_len_2 = get_edge_length(new_pt.pt_coord, pt2.pt_coord);
             point_d mid_pt_2 = get_edge_midpt(new_pt.pt_coord, pt2.pt_coord);
-            edge_indices[1] = edges_data.add_edge(new_pt.pt_id, pt2.pt_id, mid_pt_2, edge_len_2);
+            edge_indices[1] = edges_data.add_edge(new_pt.pt_id, pt2.pt_id, mid_pt_2, edge_len_2, is_boundary_edge(new_pt.pt_id, pt2.pt_id));
 
             // Add Edge 3
             point_store pt3 = points_data.get_point(tri_corner_four_pts[2]);
             double edge_len_3 = get_edge_length(new_pt.pt_coord, pt3.pt_coord);
             point_d mid_pt_3 = get_edge_midpt(new_pt.pt_coord, pt3.pt_coord);
-            edge_indices[2] = edges_data.add_edge(new_pt.pt_id, pt3.pt_id, mid_pt_3, edge_len_3);
+            edge_indices[2] = edges_data.add_edge(new_pt.pt_id, pt3.pt_id, mid_pt_3, edge_len_3, is_boundary_edge(new_pt.pt_id, pt3.pt_id));
 
             // Add Edge 4
             point_store pt4 = points_data.get_point(tri_corner_four_pts[3]);
             double edge_len_4 = get_edge_length(new_pt.pt_coord, pt4.pt_coord);
             point_d mid_pt_4 = get_edge_midpt(new_pt.pt_coord, pt4.pt_coord);
-            edge_indices[3] = edges_data.add_edge(new_pt.pt_id, pt4.pt_id, mid_pt_4, edge_len_4);
+            edge_indices[3] = edges_data.add_edge(new_pt.pt_id, pt4.pt_id, mid_pt_4, edge_len_4, is_boundary_edge(new_pt.pt_id, pt4.pt_id));
             //_________________________________________________________________________________
 
 
@@ -328,19 +328,19 @@ namespace _2DTriangle_Mesh_Generator.mesh_control.delaunay_triangulation
             point_store pt1 = points_data.get_point(tri_three_pts[0]);
             double edge_len_1 = get_edge_length(new_pt.pt_coord, pt1.pt_coord);
             point_d mid_pt_1 = get_edge_midpt(new_pt.pt_coord, pt1.pt_coord);
-            edge_indices[0] = edges_data.add_edge(new_pt.pt_id, pt1.pt_id, mid_pt_1, edge_len_1);
+            edge_indices[0] = edges_data.add_edge(new_pt.pt_id, pt1.pt_id, mid_pt_1, edge_len_1, is_boundary_edge(new_pt.pt_id, pt1.pt_id));
 
             // Add Edge 2
             point_store pt2 = points_data.get_point(tri_three_pts[1]);
             double edge_len_2 = get_edge_length(new_pt.pt_coord, pt2.pt_coord);
             point_d mid_pt_2 = get_edge_midpt(new_pt.pt_coord, pt2.pt_coord);
-            edge_indices[1] = edges_data.add_edge(new_pt.pt_id, pt2.pt_id, mid_pt_2, edge_len_2);
+            edge_indices[1] = edges_data.add_edge(new_pt.pt_id, pt2.pt_id, mid_pt_2, edge_len_2, is_boundary_edge(new_pt.pt_id, pt2.pt_id));
 
             // Add Edge 3
             point_store pt3 = points_data.get_point(tri_three_pts[2]);
             double edge_len_3 = get_edge_length(new_pt.pt_coord, pt3.pt_coord);
             point_d mid_pt_3 = get_edge_midpt(new_pt.pt_coord, pt3.pt_coord);
-            edge_indices[2] = edges_data.add_edge(new_pt.pt_id, pt3.pt_id, mid_pt_3, edge_len_3);
+            edge_indices[2] = edges_data.add_edge(new_pt.pt_id, pt3.pt_id, mid_pt_3, edge_len_3, is_boundary_edge(new_pt.pt_id, pt3.pt_id));
             //_________________________________________________________________________________
 
             // Add three triangles
@@ -430,7 +430,7 @@ namespace _2DTriangle_Mesh_Generator.mesh_control.delaunay_triangulation
             point_store other_pt = points_data.get_point(tri_corner_four_pts[2]);
             double edge_len_n = get_edge_length(c_pt.pt_coord, other_pt.pt_coord);
             point_d mid_pt_n = get_edge_midpt(c_pt.pt_coord, other_pt.pt_coord);
-            edge_index = edges_data.add_edge(c_pt.pt_id, other_pt.pt_id, mid_pt_n, edge_len_n);
+            edge_index = edges_data.add_edge(c_pt.pt_id, other_pt.pt_id, mid_pt_n, edge_len_n, is_boundary_edge(c_pt.pt_id, other_pt.pt_id));
             //_________________________________________________________________________________
 
             // Add two triangles
@@ -491,6 +491,17 @@ namespace _2DTriangle_Mesh_Generator.mesh_control.delaunay_triangulation
             //_________________________________________________________________________________
 
             return output_indices;
+        }
+
+        private bool is_boundary_edge(int pt1_id, int pt2_id)
+        {
+            // Returns whether the edge is part of surface boundary
+            if(this.points_data.get_point(pt1_id).pt_type == 3 ||
+                this.points_data.get_point(pt2_id).pt_type ==3)
+            {
+                return false;
+            }
+            return true;
         }
 
         public void order_edges_and_points(ref List<int> tri_corner_edges, ref List<int> t_c_pts, ref List<int> t_c_edges)
@@ -559,15 +570,15 @@ namespace _2DTriangle_Mesh_Generator.mesh_control.delaunay_triangulation
             (int e1, int e2, int e3) tri_edges = triangles_data.get_specific_triangle_edge_ids(tri_id);
             int common_edge_id = -1;
 
-            if (edges_data.is_specific_edge_endpt(tri_edges.e1, pt.pt_id) == false)
+            if (edges_data.is_specific_edge_with_endpt(tri_edges.e1, pt.pt_id) == false)
             {
                 common_edge_id = tri_edges.e1;
             }
-            else if (edges_data.is_specific_edge_endpt(tri_edges.e2, pt.pt_id) == false)
+            else if (edges_data.is_specific_edge_with_endpt(tri_edges.e2, pt.pt_id) == false)
             {
                 common_edge_id = tri_edges.e2;
             }
-            else if (edges_data.is_specific_edge_endpt(tri_edges.e3, pt.pt_id) == false)
+            else if (edges_data.is_specific_edge_with_endpt(tri_edges.e3, pt.pt_id) == false)
             {
                 common_edge_id = tri_edges.e3;
             }
@@ -631,6 +642,110 @@ namespace _2DTriangle_Mesh_Generator.mesh_control.delaunay_triangulation
             }
         }
 
+        public void flip_non_constrained_edges(int tri_id, point_store pt,int bk_pt)
+        {
+            //flip recursively for the new pair of triangles
+            //
+            //           pl                    pl
+            //          /||\                  /  \
+            //       al/ || \bl            al/    \bl
+            //        /  ||  \              /      \
+            //       /  a||b  \    flip    /___a____\
+            //     p0\   ||   /pt   =>   p0\---b----/pt
+            //        \  ||  /              \      /
+            //       ar\ || /br            ar\    /br
+            //          \||/                  \  /
+            //           p2                    p2
+            //
+            // Step:1 find the edge of this triangle which does not contain pt
+            // ___edge____
+            // \         /
+            //  \       /
+            //   \     /
+            //    \   /
+            //      pt
+
+            (int e1, int e2, int e3) tri_edges = triangles_data.get_specific_triangle_edge_ids(tri_id);
+            int common_edge_id = -1;
+
+            if (edges_data.is_specific_edge_with_endpt(tri_edges.e1, pt.pt_id) == false)
+            {
+                common_edge_id = tri_edges.e1;
+            }
+            else if (edges_data.is_specific_edge_with_endpt(tri_edges.e2, pt.pt_id) == false)
+            {
+                common_edge_id = tri_edges.e2;
+            }
+            else if (edges_data.is_specific_edge_with_endpt(tri_edges.e3, pt.pt_id) == false)
+            {
+                common_edge_id = tri_edges.e3;
+            }
+
+            // Find the neighbour tri index
+            int neighbour_tri_id = edges_data.get_specific_edge_other_triangle_id(common_edge_id, tri_id);
+
+            // legalize only if the triangle has a neighbour
+            if (neighbour_tri_id != -1)
+            {
+                // Collect the 3 edges of neighbour triangle
+                (int e1, int e2, int e3) neighbour_tri_edges = this.triangles_data.get_specific_triangle_edge_ids(neighbour_tri_id);
+
+                // No condition for constrained triangle
+                // check whether the newly added pt is inside the neighbour triangle circum circle
+                //if (triangles_data.is_point_in_specific_triangle_circumcircle(neighbour_tri_id, pt.pt_coord) == true)
+                //{
+                    HashSet<int> tri_outside_four_edges_h = new HashSet<int>();
+
+                    // Only 5 will be added (because 1 edge is common)
+                    tri_outside_four_edges_h.Add(tri_edges.e1);
+                    tri_outside_four_edges_h.Add(tri_edges.e2);
+                    tri_outside_four_edges_h.Add(tri_edges.e3);
+                    tri_outside_four_edges_h.Add(neighbour_tri_edges.e1);
+                    tri_outside_four_edges_h.Add(neighbour_tri_edges.e2);
+                    tri_outside_four_edges_h.Add(neighbour_tri_edges.e3);
+
+                    // Remove the 1 common edge
+                    tri_outside_four_edges_h.Remove(common_edge_id);
+
+                    if (tri_outside_four_edges_h.Count != 4)
+                    {
+                        System.Windows.Forms.MessageBox.Show("Error!! Some points are closer than tolerance", "Error");
+                        return;
+                    }
+                    // Remove the common edge
+                    this.edges_data.remove_edge(common_edge_id);
+
+                    // Remove the two triangles
+                    this.triangles_data.remove_triangle(tri_id);
+                    this.triangles_data.remove_triangle(neighbour_tri_id);
+
+                    // Order the IDS of edges and points
+                    List<int> tri_outside_four_edges_l = tri_outside_four_edges_h.ToList();
+
+                    // Variables to strore ordered output of edges and points
+                    List<int> tri_outside_four_edges = new List<int>();
+                    List<int> tri_outside_four_pts = new List<int>(); ;
+                    // Add the first pt
+                    tri_outside_four_pts.Add(pt.pt_id);
+
+                    order_edges_and_points(ref tri_outside_four_edges_l, ref tri_outside_four_pts, ref tri_outside_four_edges);
+
+                    // Add new two triangles
+                    int[] triangle_id = new int[2];
+                    triangle_id = add_two_triangles(pt, tri_outside_four_pts, tri_outside_four_edges);
+
+                if (bk_pt == 13)
+                    return;
+
+                // recursion below
+                flip_bad_edges(triangle_id[0], pt);
+                flip_bad_edges(triangle_id[1], pt);
+                //}
+            }
+        }
+
+
+
         private void set_bounding_triangle(List<point_d> all_input_vertices)
         {
             point_d[] x_sorted = all_input_vertices.OrderBy(obj => obj.x).ToArray();
@@ -665,17 +780,17 @@ namespace _2DTriangle_Mesh_Generator.mesh_control.delaunay_triangulation
             // Add Edge 1
             double edge_len_1 = get_edge_length(s_p1.pt_coord, s_p2.pt_coord);
             point_d mid_pt_1 = get_edge_midpt(s_p1.pt_coord, s_p2.pt_coord);
-            stri_edges_id[0] = edges_data.add_edge(s_p1.pt_id, s_p2.pt_id, mid_pt_1, edge_len_1);
+            stri_edges_id[0] = edges_data.add_edge(s_p1.pt_id, s_p2.pt_id, mid_pt_1, edge_len_1,false);
 
             // Add Edge 2
             double edge_len_2 = get_edge_length(s_p2.pt_coord, s_p3.pt_coord);
             point_d mid_pt_2 = get_edge_midpt(s_p2.pt_coord, s_p3.pt_coord);
-            stri_edges_id[1] = edges_data.add_edge(s_p2.pt_id, s_p3.pt_id, mid_pt_2, edge_len_2);
+            stri_edges_id[1] = edges_data.add_edge(s_p2.pt_id, s_p3.pt_id, mid_pt_2, edge_len_2, false);
 
             // Add Edge 3
             double edge_len_3 = get_edge_length(s_p3.pt_coord, s_p1.pt_coord);
             point_d mid_pt_3 = get_edge_midpt(s_p3.pt_coord, s_p1.pt_coord);
-            stri_edges_id[2] = edges_data.add_edge(s_p3.pt_id, s_p1.pt_id, mid_pt_3, edge_len_3);
+            stri_edges_id[2] = edges_data.add_edge(s_p3.pt_id, s_p1.pt_id, mid_pt_3, edge_len_3, false);
             //_________________________________________________________________________________
 
 

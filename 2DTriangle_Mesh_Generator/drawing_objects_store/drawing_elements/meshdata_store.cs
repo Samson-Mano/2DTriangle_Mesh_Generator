@@ -50,8 +50,8 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
                 // Add to mesh vertices
                 foreach (var vertex in m_r.pts_data.get_all_points())
                 {
-                    if (vertex.pt_type == 3)
-                        continue;
+                    //if (vertex.pt_type == 3)
+                    //    continue;
 
                     this.mesh_vertices.add_point(new point_store(pt_index, vertex.pt_coord.x, vertex.pt_coord.y, m_r.point_color));
                     pt_index++;
@@ -63,8 +63,14 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
                     point_d start_pt = m_r.pts_data.get_point(edge.start_pt_id).pt_coord;
                     point_d end_pt = m_r.pts_data.get_point(edge.end_pt_id).pt_coord;
 
-                    this.mesh_edges.add_line(ed_index, start_pt.x, start_pt.y, m_r.edge_color,
-                        end_pt.x, end_pt.y, m_r.edge_color);
+                    Color clr1 = m_r.edge_color;
+                    //if(edge.is_boundary_edge == true)
+                    //{
+                    //    clr1 = Color.Black;
+                    //}
+
+                    this.mesh_edges.add_line(ed_index, start_pt.x, start_pt.y, clr1,
+                        end_pt.x, end_pt.y, clr1);
                     ed_index++;
                 }
 

@@ -20,12 +20,12 @@ namespace _2DTriangle_Mesh_Generator.mesh_control.delaunay_triangulation
             this.unique_edgeid_list = new HashSet<int>();
         }
 
-        public int add_edge(int pt1_id, int pt2_id, point_d mid_pt, double edge_length)
+        public int add_edge(int pt1_id, int pt2_id, point_d mid_pt, double edge_length,bool is_boundary_edge)
         {
             // Add Edge
             int edge_id = get_unique_edge_id();
 
-            this.all_edges.Add(edge_id, new edge_store(edge_id, pt1_id, pt2_id, mid_pt, edge_length));
+            this.all_edges.Add(edge_id, new edge_store(edge_id, pt1_id, pt2_id, mid_pt, edge_length,is_boundary_edge));
             return edge_id;
         }
 
@@ -74,12 +74,28 @@ namespace _2DTriangle_Mesh_Generator.mesh_control.delaunay_triangulation
             return e1.other_triangle_id(tri_id);
         }
 
-        public bool is_specific_edge_endpt(int edge_id, int pt_id)
+        public bool is_specific_edge_with_endpt(int edge_id, int pt_id)
         {
             // returns whether the given pt_id is either startpt or endpt
             edge_store e1 = get_edge(edge_id);
 
             return ((e1.start_pt_id == pt_id) || (e1.end_pt_id == pt_id));
+        }
+
+        public List<int> get_specific_edge_with_endpt(int pt_id)
+        {
+            // Returns all the edges connected to this pt
+            List<int> edge_with_given_endpt = new List<int>();
+
+            foreach(edge_store ed in this.get_all_edges())
+            {
+                if(is_specific_edge_with_endpt(ed.edge_id,pt_id) == true)
+                {
+                    edge_with_given_endpt.Add(ed.edge_id);
+                }
+            }
+
+            return edge_with_given_endpt;
         }
 
         private bool test_point_on_line(point_d the_pt, point_d s_pt, point_d e_pt, double edge_length)
@@ -113,6 +129,46 @@ namespace _2DTriangle_Mesh_Generator.mesh_control.delaunay_triangulation
                 }
             }
             return rslt;
+        }
+
+        public static bool is_two_lines_intersect(point_d p1, point_d q1, point_d p2, point_d q2)
+        {
+            // Check whether the bounding box intersect
+            if (Math.Max(p1.x, q1.x) >= Math.Min(p2.x, q2.x) &&
+               Math.Max(p2.x, q2.x) >= Math.Min(p1.x, q1.x) &&
+               Math.Max(p1.y, q1.y) >= Math.Min(p2.y, q2.y) &&
+               Math.Max(p2.y, q2.y) >= Math.Min(p1.y, q1.y))
+            {
+                // The function that returns true if line segment 'p1q1'
+                // and 'p2q2' intersect.
+                int o1 = ordered_orientation(p1, q1, p2);
+                int o2 = ordered_orientation(p1, q1, q2);
+                int o3 = ordered_orientation(p2, q2, p1);
+                int o4 = ordered_orientation(p2, q2, q1);
+
+                // General case
+                if (o1 != o2 && o3 != o4)
+                    return true;
+            }
+            // colinear cases are not considered !!!!
+
+            return false; // Doesn't fall in any of the above cases
+        }
+
+        public static int ordered_orientation(point_d p, point_d q, point_d r)
+        {
+            // To find orientation of ordered triplet (p, q, r).
+            // The function returns following values
+            // 0 --> p, q and r are collinear
+            // 1 --> Clockwise
+            // 2 --> Counterclockwise
+
+            double val = (((q.y - p.y) * (r.x - q.x)) - ((q.x - p.x) * (r.y - q.y)));
+
+           // if (Math.Round(val, 2) == 0) return 0; // collinear
+
+            return (val > 0) ? 1 : -1; // clock or counterclock wise
+
         }
 
         private int get_unique_edge_id()

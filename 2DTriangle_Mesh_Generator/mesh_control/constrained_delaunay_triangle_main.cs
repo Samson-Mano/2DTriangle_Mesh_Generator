@@ -196,8 +196,6 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                 public int boundary_id { get; private set; }
                 public HashSet<point_store> bndry_pts { get; private set; }
                 public bool is_outter_bndry { get; private set; }
-
-
                 public boundary_store(int t_bndry_id, HashSet<point_store> t_bndry_pts, bool t_is_outter_bndry)
                 {
                     this.boundary_id = t_bndry_id;
@@ -241,16 +239,17 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                 List<point_d> corner_points = new List<point_d>();
                 List<point_d> edge_points = new List<point_d>();
                 List<point_d> outter_bndry_pts = new List<point_d>();
+                List<List<point_d>> inner_bndry_pts = new List<List<point_d>>();
 
                 // Get the outter boundary points
                 foreach (point_store pts in outter_bndry.bndry_pts)
                 {
-                    if(pts.pt_type == 1)
+                    if (pts.pt_type == 1)
                     {
                         // Add to corner point list
                         corner_points.Add(pts.pt_coord);
                     }
-                    else if(pts.pt_type == 2)
+                    else if (pts.pt_type == 2)
                     {
                         // Add to edge point list
                         edge_points.Add(pts.pt_coord);
@@ -263,6 +262,8 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                 // Get the inner boundary points
                 foreach (boundary_store innr_bndry in inner_bndries)
                 {
+                    List<point_d> i_bndry_pts = new List<point_d>();
+
                     foreach (point_store pts in innr_bndry.bndry_pts)
                     {
                         if (pts.pt_type == 1)
@@ -275,12 +276,18 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
                             // Add to edge point list
                             edge_points.Add(pts.pt_coord);
                         }
+
+                        // Add the particular inner boundart pts
+                        i_bndry_pts.Add(pts.pt_coord);
                     }
+
+                    // Add to the main list
+                    inner_bndry_pts.Add(i_bndry_pts);
                 }
 
                 // Delaunay triangulation happens here
-                mesh_data = new mesh_store(corner_points,edge_points, outter_bndry_pts);
-              
+                mesh_data = new mesh_store(corner_points, edge_points, outter_bndry_pts,inner_bndry_pts);
+
 
             }
 

@@ -9,6 +9,12 @@ namespace _2DTriangle_Mesh_Generator.mesh_control
 {
     public class constrained_delaunay_triangulation
     {
+        /*
+        |\  | OT USED
+        | \ |
+        |  \|
+
+        */
         public static double eps = 0.000001; // 10^-6
 
         public bool is_surface_read = false;

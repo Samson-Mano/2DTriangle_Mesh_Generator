@@ -22,7 +22,9 @@ namespace _2DTriangle_Mesh_Generator.mesh_control.delaunay_triangulation
 
         public double edge_length { get; private set; }
 
-        public edge_store(int i_edge_id, int i_start_pt_id, int i_end_pt_id, point_d i_mid_pt, double i_edge_length)
+        public bool is_boundary_edge { get; private set; }
+
+        public edge_store(int i_edge_id, int i_start_pt_id, int i_end_pt_id, point_d i_mid_pt, double i_edge_length, bool i_is_boundary_edge)
         {
             // Empty Constructor
             // set id
@@ -38,6 +40,10 @@ namespace _2DTriangle_Mesh_Generator.mesh_control.delaunay_triangulation
             // Set the mid & edges
             this.mid_pt = i_mid_pt;
             this.edge_length = i_edge_length;
+            this.is_boundary_edge = is_boundary_edge;
+
+            // set whether the edge is part of boundary
+            this.is_boundary_edge = i_is_boundary_edge;
             //______________________________________________________________
         }
 

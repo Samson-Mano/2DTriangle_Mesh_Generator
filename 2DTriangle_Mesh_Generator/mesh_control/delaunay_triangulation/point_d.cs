@@ -58,6 +58,17 @@ namespace _2DTriangle_Mesh_Generator.mesh_control.delaunay_triangulation
             return false;
         }
 
+        public override bool Equals(object obj)
+        {
+            bool result = false;
+
+            if (obj is point_d)
+            {
+                result = this.Equals((point_d)obj);
+            }
+            return result; 
+        }
+
         public static double GetAngle(point_d A_pt, point_d B_pt, point_d C_pt)
         {
             // Get the dot product.

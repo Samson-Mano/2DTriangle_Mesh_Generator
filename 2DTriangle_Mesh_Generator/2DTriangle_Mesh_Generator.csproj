@@ -159,6 +159,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="global_variables\Junk_code.txt" />
     <Content Include="innx_icon.ico" />
     <Content Include="junk_unusedcode.txt" />
   </ItemGroup>
