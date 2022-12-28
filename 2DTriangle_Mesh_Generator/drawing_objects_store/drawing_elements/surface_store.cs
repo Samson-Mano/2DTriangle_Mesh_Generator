@@ -26,6 +26,8 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
         public double mesh_elem_size { get; private set; }
 
+        public bool is_meshed { get; set; }
+
         public closed_boundary_store closed_outer_bndry { get; private set; }
 
         public HashSet<closed_boundary_store> closed_inner_bndries { get; private set; }
@@ -143,6 +145,8 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
 
             // Set the element density
             set_curve_element_density(this.mesh_elem_size);
+
+            this.is_meshed = false;
         }
 
         public void set_curve_element_density(double min_elem_length)
@@ -216,9 +220,15 @@ namespace _2DTriangle_Mesh_Generator.drawing_objects_store.drawing_elements
             surface_data.Add(inner_surf_boundarycurve_ids);
 
             // Surface meshed
-            surface_data.Add("false");
+            surface_data.Add(this.is_meshed.ToString());
 
             return surface_data;
+        }
+
+        public void update_surface_mesh_status(bool i_is_meshed)
+        {
+            // Update the mesh status of this surface
+            this.is_meshed = i_is_meshed;
         }
 
         public void set_openTK_objects()

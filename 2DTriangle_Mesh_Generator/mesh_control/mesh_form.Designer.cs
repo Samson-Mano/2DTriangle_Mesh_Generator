@@ -77,7 +77,7 @@
             this.button_delete.Name = "button_delete";
             this.button_delete.Size = new System.Drawing.Size(133, 37);
             this.button_delete.TabIndex = 1;
-            this.button_delete.Text = "Reject Mesh";
+            this.button_delete.Text = "Delete Mesh";
             this.button_delete.UseVisualStyleBackColor = true;
             this.button_delete.Click += new System.EventHandler(this.button_delete_Click);
             // 
@@ -292,7 +292,7 @@
             // 
             // Column_edgemeshed
             // 
-            this.Column_edgemeshed.HeaderText = "Edge Meshed";
+            this.Column_edgemeshed.HeaderText = "Meshed side";
             this.Column_edgemeshed.MinimumWidth = 6;
             this.Column_edgemeshed.Name = "Column_edgemeshed";
             this.Column_edgemeshed.ReadOnly = true;
