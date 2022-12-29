@@ -99,7 +99,6 @@ namespace _2DTriangle_Mesh_Generator
             }
         }
 
-
         private void createMeshToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // Create mesh
@@ -113,6 +112,155 @@ namespace _2DTriangle_Mesh_Generator
                 this.is_mesh_form_open = true;
                 mesh_form1.ShowDialog();
             }
+
+        }
+
+        private void exportMeshToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Export the mesh as *.txt format
+            string points_str = "";
+            string edges_str = "";
+            string triangles_str = "";
+
+            // Renumber all the Nodes
+            int renum_iterator = 0;
+            int i, j;
+            int prev_id;
+            bool is_exist;
+            Dictionary<int, int>[] renum_nodes = new Dictionary<int, int>[mesh_result_store.Count];
+            Dictionary<int, int>[] renum_edges = new Dictionary<int, int>[mesh_result_store.Count];
+            Dictionary<int, int>[] renum_tris = new Dictionary<int, int>[mesh_result_store.Count];
+
+            for (i = 0; i < mesh_result_store.Count; i++)
+            {
+                renum_nodes[i] = new Dictionary<int, int>();
+                // Nodes
+                foreach (mesh_control.delaunay_triangulation.point_store pts in mesh_result_store[i].pts_data.get_all_points())
+                {
+                    // Check whether the point already exists
+                    is_exist = false;
+                    prev_id = -1;
+                    for (j = i - 1; j >= 0; j--)
+                    {
+                        // Get the point list from previous mesh point data
+                        List<point_store> previous_mesh_pts = mesh_result_store[j].pts_data.get_all_points();
+                        point_store existing_node = previous_mesh_pts.Find(obj => obj.pt_coord.Equals(pts.pt_coord));
+                        if (existing_node != null)
+                        {
+                            prev_id = renum_nodes[j][existing_node.pt_id];
+                            is_exist = true;
+                            break;
+                        }
+                    }
+
+                    if (is_exist == true)
+                    {
+                        // The point already exists from previous mesh so, use its new id
+                        renum_nodes[i].Add(pts.pt_id, prev_id);
+                    }
+                    else
+                    {
+                        // Link the pt unique id to the new id which spans through all mesh
+                        renum_nodes[i].Add(pts.pt_id, renum_iterator);
+                        renum_iterator++;
+                    }
+                }
+
+                renum_edges[i] = new Dictionary<int, int>();
+                renum_iterator = 0;
+                // Edges
+                foreach (mesh_control.delaunay_triangulation.edge_store edg in mesh_result_store[i].edges_data.get_all_edges())
+                {
+                    // Check whether the edge already exists
+                    is_exist = false;
+                    prev_id = -1;
+                    for (j = i - 1; j >= 0; j--)
+                    {
+                        // Get the point list from previous mesh point data
+                        List<edge_store> previous_mesh_edges = mesh_result_store[j].edges_data.get_all_edges();
+                        // Current edges (new start & end pt id)
+                        int n_start_pt_id = renum_nodes[i][edg.start_pt_id];
+                        int n_end_pt_id = renum_nodes[i][edg.end_pt_id];
+
+                        edge_store existing_edge = previous_mesh_edges.Find(obj =>
+                        (renum_nodes[j][obj.start_pt_id] == n_start_pt_id && renum_nodes[j][obj.end_pt_id] == n_end_pt_id) ||
+                        (renum_nodes[j][obj.start_pt_id] == n_end_pt_id && renum_nodes[j][obj.end_pt_id] == n_start_pt_id));
+
+                        if (existing_edge != null)
+                        {
+                            prev_id = renum_edges[j][existing_edge.edge_id];
+                            is_exist = true;
+                            break;
+                        }
+                    }
+
+                    if (is_exist == true)
+                    {
+                        // The point already exists from previous mesh so, use its new id
+                        renum_edges[i].Add(edg.edge_id, prev_id);
+                    }
+                    else
+                    {
+                        // Link the pt unique id to the new id which spans through all mesh
+                        renum_edges[i].Add(edg.edge_id, renum_iterator);
+                        renum_iterator++;
+                    }
+                }
+
+                renum_tris[i] = new Dictionary<int, int>();
+                renum_iterator = 0;
+                // Triangles
+                foreach (mesh_control.delaunay_triangulation.triangle_store tri in mesh_result_store[i].triangles_data.get_all_triangles())
+                {
+                    // Link the pt unique id to the new id which spans through all mesh
+                    renum_tris[i].Add(tri.tri_id, renum_iterator);
+                    renum_iterator++;
+                }
+            }
+
+
+            i = 0;
+            foreach (mesh_control.mesh_result mesh_result in mesh_result_store)
+            {
+                // Points
+                foreach (mesh_control.delaunay_triangulation.point_store pts in mesh_result.pts_data.get_all_points())
+                {
+                    points_str = points_str + renum_nodes[i][pts.pt_id] + ","
+                        + pts.pt_coord.x + ","
+                        + pts.pt_coord.y + Environment.NewLine;
+                }
+
+                // Edges
+                foreach (mesh_control.delaunay_triangulation.edge_store eds in mesh_result.edges_data.get_all_edges())
+                {
+                    edges_str = edges_str + renum_edges[i][eds.edge_id] + ","
+                        + renum_nodes[i][eds.start_pt_id] + ","
+                        + renum_nodes[i][eds.end_pt_id] + Environment.NewLine;
+                }
+
+                // Triangles
+                foreach (mesh_control.delaunay_triangulation.triangle_store tri in mesh_result.triangles_data.get_all_triangles())
+                {
+                    triangles_str = triangles_str + renum_tris[i][tri.tri_id] + ","
+                        + renum_nodes[i][tri.pt1_id] + ","
+                        + renum_nodes[i][tri.pt2_id] + ","
+                        + renum_nodes[i][tri.pt3_id] + Environment.NewLine;
+                }
+
+                i++;
+            }
+
+            string rslt_str = "____________________________________ Mesh data ________________________________" + Environment.NewLine;
+            rslt_str =rslt_str + "--- Generated from 2D Traingle Mesh generator developed by Samson Mano ----" + Environment.NewLine;
+            rslt_str = rslt_str + "________________________________________________________________________________" + Environment.NewLine;
+            rslt_str = rslt_str + points_str + "END" + Environment.NewLine;
+            rslt_str = rslt_str + "____________________________________________________________________________" + Environment.NewLine;
+            rslt_str = rslt_str + edges_str +  "END" + Environment.NewLine;
+            rslt_str = rslt_str + "____________________________________________________________________________" + Environment.NewLine;
+            rslt_str = rslt_str + triangles_str +  "END" + Environment.NewLine;
+            rslt_str = rslt_str + "____________________________________________________________________________" + Environment.NewLine;
+
+            global_variables.gvariables_static.Show_error_Dialog("Result", rslt_str);
 
         }
 
@@ -134,14 +282,14 @@ namespace _2DTriangle_Mesh_Generator
             glControl_main_panel.Invalidate();
         }
 
-        public void add_mesh_data(int surf_id,mesh_store i_mesh_data)
+        public void add_mesh_data(int surf_id, mesh_store i_mesh_data)
         {
             // Store the mesh data from mesh form
 
-                this.mesh_result_store.Add(new mesh_control.mesh_result(surf_id,  i_mesh_data.result_pts_data,
-    i_mesh_data.result_edge_data,
-    i_mesh_data.result_tri_data));
-          
+            this.mesh_result_store.Add(new mesh_control.mesh_result(surf_id, i_mesh_data.result_pts_data,
+i_mesh_data.result_edge_data,
+i_mesh_data.result_tri_data));
+
             // Add mesh data
             geom_obj.implement_mesh(this.mesh_result_store);
 
@@ -156,9 +304,9 @@ namespace _2DTriangle_Mesh_Generator
         {
             // Store the mesh data from mesh form
             int remove_index;
-            remove_index= this.mesh_result_store.FindIndex(obj => obj.mesh_surf_id == surf_id);
+            remove_index = this.mesh_result_store.FindIndex(obj => obj.mesh_surf_id == surf_id);
 
-            this.mesh_result_store.RemoveAt(remove_index);  
+            this.mesh_result_store.RemoveAt(remove_index);
 
             // Add mesh data
             geom_obj.implement_mesh(this.mesh_result_store);

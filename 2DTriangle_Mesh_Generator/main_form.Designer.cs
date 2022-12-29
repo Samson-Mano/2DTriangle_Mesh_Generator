@@ -38,6 +38,7 @@
             this.createMeshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel_zoom_value = new System.Windows.Forms.ToolStripStatusLabel();
+            this.exportMeshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -87,21 +88,22 @@
             // importGeometryToolStripMenuItem
             // 
             this.importGeometryToolStripMenuItem.Name = "importGeometryToolStripMenuItem";
-            this.importGeometryToolStripMenuItem.Size = new System.Drawing.Size(206, 26);
+            this.importGeometryToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.importGeometryToolStripMenuItem.Text = "Import Geometry";
             this.importGeometryToolStripMenuItem.Click += new System.EventHandler(this.importGeometryToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(206, 26);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // meshToolStripMenuItem
             // 
             this.meshToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.createMeshToolStripMenuItem});
+            this.createMeshToolStripMenuItem,
+            this.exportMeshToolStripMenuItem});
             this.meshToolStripMenuItem.Name = "meshToolStripMenuItem";
             this.meshToolStripMenuItem.Size = new System.Drawing.Size(58, 24);
             this.meshToolStripMenuItem.Text = "Mesh";
@@ -109,7 +111,7 @@
             // createMeshToolStripMenuItem
             // 
             this.createMeshToolStripMenuItem.Name = "createMeshToolStripMenuItem";
-            this.createMeshToolStripMenuItem.Size = new System.Drawing.Size(174, 26);
+            this.createMeshToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.createMeshToolStripMenuItem.Text = "Create Mesh";
             this.createMeshToolStripMenuItem.Click += new System.EventHandler(this.createMeshToolStripMenuItem_Click);
             // 
@@ -130,6 +132,13 @@
             this.toolStripStatusLabel_zoom_value.Name = "toolStripStatusLabel_zoom_value";
             this.toolStripStatusLabel_zoom_value.Size = new System.Drawing.Size(92, 20);
             this.toolStripStatusLabel_zoom_value.Text = "Zoom: 100%";
+            // 
+            // exportMeshToolStripMenuItem
+            // 
+            this.exportMeshToolStripMenuItem.Name = "exportMeshToolStripMenuItem";
+            this.exportMeshToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.exportMeshToolStripMenuItem.Text = "Export Mesh";
+            this.exportMeshToolStripMenuItem.Click += new System.EventHandler(this.exportMeshToolStripMenuItem_Click);
             // 
             // main_form
             // 
@@ -166,6 +175,7 @@
         private System.Windows.Forms.ToolStripMenuItem createMeshToolStripMenuItem;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel_zoom_value;
+        private System.Windows.Forms.ToolStripMenuItem exportMeshToolStripMenuItem;
     }
 }
 
