@@ -155,11 +155,11 @@ namespace _2DTriangle_Mesh_Generator.mesh_control.delaunay_triangulation
             // Renumber the ids of the mesh data
             Dictionary<int, int> pt_id_data = new Dictionary<int, int>();
             Dictionary<int, int> edge_id_data = new Dictionary<int, int>();
-           // Dictionary<int, int> tri_id_data = new Dictionary<int, int>();
-         
-           
+            // Dictionary<int, int> tri_id_data = new Dictionary<int, int>();
+
+
             // Add the points to the result point list
-            foreach(int existing_pt_id in final_mesh_data.pts)
+            foreach (int existing_pt_id in final_mesh_data.pts)
             {
                 point_store pt = BW_delaunay.points_data.get_point(existing_pt_id);
                 // Scale back to original scale (remove the spacing gap from original)
@@ -170,13 +170,27 @@ namespace _2DTriangle_Mesh_Generator.mesh_control.delaunay_triangulation
             }
 
             // Add the edges to the result edge list
+            List<edge_store> inpt_constrained_edges_list = inpt_constrained_edges.get_all_edges();
+
             foreach (int existing_edge_id in final_mesh_data.edg)
             {
                 edge_store ed = BW_delaunay.edges_data.get_edge(existing_edge_id);
                 int pt1_id = pt_id_data[ed.start_pt_id];
                 int pt2_id = pt_id_data[ed.end_pt_id];
 
-                int new_ed_id = this.result_edge_data.add_edge(pt1_id,pt2_id,ed.mid_pt,ed.edge_length,ed.is_boundary_edge);
+                bool is_bndry_edge = false;
+                if(ed.is_boundary_edge == true)
+                {
+                    // Confirm the boundary edge
+                    if (inpt_constrained_edges_list.Exists(obj => (obj.start_pt_id == ed.start_pt_id && obj.end_pt_id == ed.end_pt_id)||
+                    (obj.start_pt_id == ed.end_pt_id && obj.end_pt_id == ed.start_pt_id)) == true)
+                    {
+                        is_bndry_edge = true;
+                    }
+                }
+
+
+                int new_ed_id = this.result_edge_data.add_edge(pt1_id, pt2_id, ed.mid_pt, ed.edge_length, is_bndry_edge);
                 edge_id_data.Add(existing_edge_id, new_ed_id);
             }
 
@@ -192,7 +206,7 @@ namespace _2DTriangle_Mesh_Generator.mesh_control.delaunay_triangulation
                 int ed2_id = edge_id_data[tr.e2_id];
                 int ed3_id = edge_id_data[tr.e3_id];
 
-                this.result_tri_data.add_triangle(pt1_id,pt2_id,pt3_id,ed1_id,ed2_id,ed3_id,tr.mid_pt,tr.circum_center,tr.shortest_edge_length,tr.circum_radius);
+                this.result_tri_data.add_triangle(pt1_id, pt2_id, pt3_id, ed1_id, ed2_id, ed3_id, tr.mid_pt, tr.circum_center, tr.shortest_edge_length, tr.circum_radius);
                 // edge_id_data.Add(existing_edge_id, new_ed_id);
             }
 
@@ -441,9 +455,9 @@ namespace _2DTriangle_Mesh_Generator.mesh_control.delaunay_triangulation
             // Find all the triangles which are inside the meshed surface
             HashSet<int> result_tri_ids = new HashSet<int>();
 
-            foreach(triangle_store tri in BW_delaunay.triangles_data.get_all_triangles())
+            foreach (triangle_store tri in BW_delaunay.triangles_data.get_all_triangles())
             {
-                if(is_point_in_surface(tri.mid_pt, sc_outter_bndry_pts, sc_inner_bndry_pts) == true)
+                if (is_point_in_surface(tri.mid_pt, sc_outter_bndry_pts, sc_inner_bndry_pts) == true)
                 {
                     // Add the tri id which is inside the surface
                     result_tri_ids.Add(tri.tri_id);

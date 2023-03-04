@@ -117,11 +117,6 @@ namespace _2DTriangle_Mesh_Generator
 
         private void exportMeshToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // Export the mesh as *.txt format
-            string points_str = "";
-            string edges_str = "";
-            string triangles_str = "";
-
             // Renumber all the Nodes
             int renum_iterator = 0;
             int i, j;
@@ -165,9 +160,13 @@ namespace _2DTriangle_Mesh_Generator
                         renum_iterator++;
                     }
                 }
+            }
 
+            renum_iterator = 0;
+
+            for (i = 0; i < mesh_result_store.Count; i++)
+            {
                 renum_edges[i] = new Dictionary<int, int>();
-                renum_iterator = 0;
                 // Edges
                 foreach (mesh_control.delaunay_triangulation.edge_store edg in mesh_result_store[i].edges_data.get_all_edges())
                 {
@@ -206,61 +205,173 @@ namespace _2DTriangle_Mesh_Generator
                         renum_iterator++;
                     }
                 }
+            }
 
+            renum_iterator = 0;
+            string t_tri_sets = "TRIANGLE SETS " + Environment.NewLine;
+
+            for (i = 0; i < mesh_result_store.Count; i++)
+            {
+                t_tri_sets = t_tri_sets + "SET " + (i + 1) + Environment.NewLine;
                 renum_tris[i] = new Dictionary<int, int>();
-                renum_iterator = 0;
                 // Triangles
                 foreach (mesh_control.delaunay_triangulation.triangle_store tri in mesh_result_store[i].triangles_data.get_all_triangles())
                 {
                     // Link the pt unique id to the new id which spans through all mesh
                     renum_tris[i].Add(tri.tri_id, renum_iterator);
+                    t_tri_sets = t_tri_sets + renum_iterator + ", ";
                     renum_iterator++;
                 }
+
+                // Remove the last two characters
+                t_tri_sets = t_tri_sets.Remove(t_tri_sets.Length - 2, 2) + Environment.NewLine;
             }
 
 
             i = 0;
+            // Export the mesh as *.txt format
+            string temp_str = "";
+            int temp_id;
+            Dictionary<int, string> point_id_str = new Dictionary<int, string>();
+            Dictionary<int, string> edge_id_str = new Dictionary<int, string>();
+            Dictionary<int, string> tri_id_str = new Dictionary<int, string>();
+            // Nodes set
+            string n_corner_nodes_str = "CORNER NODES  " + Environment.NewLine;
+            string n_edge_nodes_str = "EDGE NODES  " + Environment.NewLine;
+            string e_bndry_edge_str = "BOUNDARY EDGES  " + Environment.NewLine;
+
             foreach (mesh_control.mesh_result mesh_result in mesh_result_store)
             {
                 // Points
                 foreach (mesh_control.delaunay_triangulation.point_store pts in mesh_result.pts_data.get_all_points())
                 {
-                    points_str = points_str + renum_nodes[i][pts.pt_id] + ","
+                    temp_id = renum_nodes[i][pts.pt_id];
+                    temp_str = temp_id + ","
                         + pts.pt_coord.x + ","
-                        + pts.pt_coord.y + Environment.NewLine;
+                        + pts.pt_coord.y;
+
+                    // Add only if the node is not already present
+                    if (point_id_str.ContainsKey(temp_id) != true)
+                    {
+                        point_id_str.Add(temp_id, temp_str);
+
+                        // Add to corner and edge node list
+                        if (pts.pt_type == 1)
+                        {
+                            // corner nodes
+                            n_corner_nodes_str = n_corner_nodes_str + temp_id + ", ";
+                        }
+
+                        if (pts.pt_type == 2)
+                        {
+                            // Edge nodes
+                            n_edge_nodes_str = n_edge_nodes_str + temp_id + ", ";
+                        }
+
+                    }
                 }
+                // Remove the last two characters
+                n_corner_nodes_str = n_corner_nodes_str.Remove(n_corner_nodes_str.Length - 2, 2) + Environment.NewLine;
+                n_edge_nodes_str = n_edge_nodes_str.Remove(n_edge_nodes_str.Length - 2, 2) + Environment.NewLine;
 
                 // Edges
                 foreach (mesh_control.delaunay_triangulation.edge_store eds in mesh_result.edges_data.get_all_edges())
                 {
-                    edges_str = edges_str + renum_edges[i][eds.edge_id] + ","
+                    temp_id = renum_edges[i][eds.edge_id];
+                    temp_str = temp_id + ","
                         + renum_nodes[i][eds.start_pt_id] + ","
-                        + renum_nodes[i][eds.end_pt_id] + Environment.NewLine;
+                        + renum_nodes[i][eds.end_pt_id];
+
+                    // Add only if the edge is not already present
+                    if (edge_id_str.ContainsKey(temp_id) != true)
+                    {
+                        edge_id_str.Add(temp_id, temp_str);
+
+                        // Add to the boundary edges store
+                        if (eds.is_boundary_edge == true)
+                        {
+                            e_bndry_edge_str = e_bndry_edge_str + temp_id + ", ";
+                        }
+                    }
                 }
+                // Remove the last two characters
+                e_bndry_edge_str = e_bndry_edge_str.Remove(e_bndry_edge_str.Length - 2, 2) + Environment.NewLine;
 
                 // Triangles
                 foreach (mesh_control.delaunay_triangulation.triangle_store tri in mesh_result.triangles_data.get_all_triangles())
                 {
-                    triangles_str = triangles_str + renum_tris[i][tri.tri_id] + ","
+                    temp_id = renum_tris[i][tri.tri_id];
+                    temp_str = temp_id + ","
                         + renum_nodes[i][tri.pt1_id] + ","
                         + renum_nodes[i][tri.pt2_id] + ","
-                        + renum_nodes[i][tri.pt3_id] + Environment.NewLine;
-                }
+                        + renum_nodes[i][tri.pt3_id];
 
+                    // Add only if the triangle is not already present
+                    if (tri_id_str.ContainsKey(temp_id) != true)
+                    {
+                        tri_id_str.Add(temp_id, temp_str);
+                    }
+                }
                 i++;
             }
 
+            // Results string
+            string points_str = "NODES " + Environment.NewLine;
+            string edges_str = "EDGES " + Environment.NewLine;
+            string triangles_str = "TRIANGLES " + Environment.NewLine;
+
+            foreach (var r_str in point_id_str.OrderBy(obj => obj.Key))
+            {
+                points_str = points_str + r_str.Value + Environment.NewLine;
+            }
+
+            foreach (var r_str in edge_id_str.OrderBy(obj => obj.Key))
+            {
+                edges_str = edges_str + r_str.Value + Environment.NewLine;
+            }
+
+            foreach (var r_str in tri_id_str.OrderBy(obj => obj.Key))
+            {
+                triangles_str = triangles_str + r_str.Value + Environment.NewLine;
+            }
+
+
+
             string rslt_str = "____________________________________ Mesh data ________________________________" + Environment.NewLine;
-            rslt_str =rslt_str + "--- Generated from 2D Traingle Mesh generator developed by Samson Mano ----" + Environment.NewLine;
+            rslt_str = rslt_str + "--- Generated from 2D Traingle Mesh generator developed by Samson Mano ----" + Environment.NewLine;
             rslt_str = rslt_str + "________________________________________________________________________________" + Environment.NewLine;
             rslt_str = rslt_str + points_str + "END" + Environment.NewLine;
             rslt_str = rslt_str + "____________________________________________________________________________" + Environment.NewLine;
-            rslt_str = rslt_str + edges_str +  "END" + Environment.NewLine;
+            rslt_str = rslt_str + edges_str + "END" + Environment.NewLine;
             rslt_str = rslt_str + "____________________________________________________________________________" + Environment.NewLine;
-            rslt_str = rslt_str + triangles_str +  "END" + Environment.NewLine;
+            rslt_str = rslt_str + triangles_str + "END" + Environment.NewLine;
+            rslt_str = rslt_str + "____________________________________________________________________________" + Environment.NewLine;
+            rslt_str = rslt_str + n_corner_nodes_str + "END" + Environment.NewLine;
+            rslt_str = rslt_str + "____________________________________________________________________________" + Environment.NewLine;
+            rslt_str = rslt_str + n_edge_nodes_str + "END" + Environment.NewLine;
+            rslt_str = rslt_str + "____________________________________________________________________________" + Environment.NewLine;
+            rslt_str = rslt_str + e_bndry_edge_str + "END" + Environment.NewLine;
+            rslt_str = rslt_str + "____________________________________________________________________________" + Environment.NewLine;
+            rslt_str = rslt_str + t_tri_sets + "END" + Environment.NewLine;
             rslt_str = rslt_str + "____________________________________________________________________________" + Environment.NewLine;
 
-            global_variables.gvariables_static.Show_error_Dialog("Result", rslt_str);
+
+            SaveFileDialog save = new SaveFileDialog();
+            save.FileName = "mesh1.txt";
+            save.Filter = "Text File | *.txt";
+
+            if (save.ShowDialog() == DialogResult.OK)
+            {
+                StreamWriter writer = new StreamWriter(save.OpenFile());
+
+                writer.WriteLine(rslt_str);
+
+                writer.Dispose();
+                writer.Close();
+            }
+
+
+            //  global_variables.gvariables_static.Show_error_Dialog("Result", rslt_str);
 
         }
 
