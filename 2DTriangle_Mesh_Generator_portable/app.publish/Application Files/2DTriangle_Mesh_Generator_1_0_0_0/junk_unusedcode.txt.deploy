@@ -1,0 +1,190 @@
+﻿
+                // Check the lines
+                cur_index = line_index_found(curve_id);
+
+
+
+
+
+
+                if (cur_index != -1)
+                {
+                    end_ptid = this.txt_rd_rslt.str_line_datas[cur_index].str_main_data.Split(',');
+                    int start_pt_id, end_pt_id;
+
+                    // Find the start and end pt id
+                    int.TryParse(end_ptid[0], out start_pt_id);
+                    int.TryParse(end_ptid[1], out end_pt_id);
+
+                    // Check the ids before proceeding
+                    if (previous_end_pt_id != start_pt_id && previous_end_pt_id != end_pt_id)
+                    {
+                        if (previous_end_pt_id == -1)
+                        {
+                            // First instance so ignore
+                        }
+                        else if (previous_start_pt_id == start_pt_id || previous_start_pt_id == end_pt_id)
+                        {
+                            int temp_id = previous_start_pt_id;
+                            previous_start_pt_id = previous_end_pt_id;
+                            previous_end_pt_id = temp_id;
+                        }
+                        else
+                        {
+                            System.Windows.Forms.MessageBox.Show("Error");
+                        }
+                    }
+
+                    // Flip ids based on the previous id
+                    if ((previous_end_pt_id != start_pt_id) && previous_end_pt_id != -1)
+                    {
+                        int temp_id = start_pt_id;
+                        start_pt_id = end_pt_id;
+                        end_pt_id = temp_id;
+                    }
+
+                    previous_start_pt_id = start_pt_id;
+                    previous_end_pt_id = end_pt_id;
+
+                    point_store start_pt = str_to_points(start_pt_id, this.txt_rd_rslt.str_endpt_datas[endpt_index_found(start_pt_id)].str_main_data);
+                    point_store end_pt = str_to_points(end_pt_id, this.txt_rd_rslt.str_endpt_datas[endpt_index_found(end_pt_id)].str_main_data);
+                    // Additional inputs (Control points) Empty for line
+                    List<point_store> cntrl_pts = new List<point_store>();
+
+                    // Create line
+                    curve_store line = new curve_store(curve_id, start_pt, end_pt, cntrl_pts, 100, curve_store.curve_types_enum.line, gvariables_static.curve_color);
+                    // Add to the boundary curve list
+                    bndry_curves.Add(line);
+                    continue;
+                }
+
+                // Check the arcs
+                cur_index = arc_index_found(curve_id);
+
+                if (cur_index != -1)
+                {
+                    end_ptid = this.txt_rd_rslt.str_arc_datas[cur_index].str_main_data.Split(',');
+                    int start_pt_id, end_pt_id;
+
+                    // Find the start and end pt id
+                    int.TryParse(end_ptid[0], out start_pt_id);
+                    int.TryParse(end_ptid[1], out end_pt_id);
+
+
+                    // Check the ids before proceeding
+                    if (previous_end_pt_id != start_pt_id && previous_end_pt_id != end_pt_id)
+                    {
+                        if (previous_end_pt_id == -1)
+                        {
+                            // First instance so ignore
+                        }
+                        else if (previous_start_pt_id == start_pt_id || previous_start_pt_id == end_pt_id)
+                        {
+                            int temp_id = previous_start_pt_id;
+                            previous_start_pt_id = previous_end_pt_id;
+                            previous_end_pt_id = temp_id;
+                        }
+                        else
+                        {
+                            System.Windows.Forms.MessageBox.Show("Error");
+                        }
+                    }
+
+                    // Flip ids based on the previous id
+                    if ((previous_end_pt_id != start_pt_id) && previous_end_pt_id != -1)
+                    {
+                        int temp_id = start_pt_id;
+                        start_pt_id = end_pt_id;
+                        end_pt_id = temp_id;
+                    }
+
+                    previous_start_pt_id = start_pt_id;
+                    previous_end_pt_id = end_pt_id;
+
+                    point_store start_pt = str_to_points(start_pt_id, this.txt_rd_rslt.str_endpt_datas[endpt_index_found(start_pt_id)].str_main_data);
+                    point_store end_pt = str_to_points(end_pt_id, this.txt_rd_rslt.str_endpt_datas[endpt_index_found(end_pt_id)].str_main_data);
+
+                    // Additional inputs (Control points)
+                    List<point_store> cntrl_pts = new List<point_store>();
+                    int c_id = -100;
+                    foreach (string str_cntrl_pt in this.txt_rd_rslt.str_arc_datas[cur_index].str_additional_data)
+                    {
+                        cntrl_pts.Add(str_to_points(c_id, str_cntrl_pt));
+                        c_id = c_id - 1;
+                    }
+
+                    // Create Arc
+                    curve_store arc = new curve_store(curve_id, start_pt, end_pt, cntrl_pts, 100, curve_store.curve_types_enum.arc, gvariables_static.curve_color);
+                    // Add to the boundary curve list
+                    bndry_curves.Add(arc);
+                    continue;
+                }
+
+                // Check the beziers
+                cur_index = bezier_index_found(curve_id);
+
+                if (cur_index != -1)
+                {
+                    end_ptid = this.txt_rd_rslt.str_bezier_datas[cur_index].str_main_data.Split(',');
+                    int start_pt_id, end_pt_id;
+
+                    // Find the start and end pt id
+                    int.TryParse(end_ptid[0], out start_pt_id);
+                    int.TryParse(end_ptid[1], out end_pt_id);
+
+
+                    // Check the ids before proceeding
+                    if (previous_end_pt_id != start_pt_id && previous_end_pt_id != end_pt_id)
+                    {
+                        if (previous_end_pt_id == -1)
+                        {
+                            // First instance so ignore
+                        }
+                        else if (previous_start_pt_id == start_pt_id || previous_start_pt_id == end_pt_id)
+                        {
+                            int temp_id = previous_start_pt_id;
+                            previous_start_pt_id = previous_end_pt_id;
+                            previous_end_pt_id = temp_id;
+                        }
+                        else
+                        {
+                            System.Windows.Forms.MessageBox.Show("Error");
+                        }
+                    }
+
+                    // Flip ids based on the previous id
+                    bool cntrl_pt_reverse = false;
+                    if ((previous_end_pt_id != start_pt_id) && previous_end_pt_id != -1)
+                    {
+                        int temp_id = start_pt_id;
+                        start_pt_id = end_pt_id;
+                        end_pt_id = temp_id;
+                        cntrl_pt_reverse = true;
+                    }
+
+                    previous_start_pt_id = start_pt_id;
+                    previous_end_pt_id = end_pt_id;
+
+                    point_store start_pt = str_to_points(start_pt_id, this.txt_rd_rslt.str_endpt_datas[endpt_index_found(start_pt_id)].str_main_data);
+                    point_store end_pt = str_to_points(end_pt_id, this.txt_rd_rslt.str_endpt_datas[endpt_index_found(end_pt_id)].str_main_data);
+
+                    // Additional inputs (Control points)
+                    List<point_store> cntrl_pts = new List<point_store>();
+                    int c_id = -100;
+                    foreach (string str_cntrl_pt in this.txt_rd_rslt.str_bezier_datas[cur_index].str_additional_data)
+                    {
+                        cntrl_pts.Add(str_to_points(c_id, str_cntrl_pt));
+                        c_id = c_id - 1;
+                    }
+
+                    if (cntrl_pt_reverse == true)
+                    {
+                        // reverse the control points if the start and end points are reversed
+                        cntrl_pts.Reverse();
+                    }
+
+                    // Create Arc
+                    curve_store bezier = new curve_store(curve_id, start_pt, end_pt, cntrl_pts, 100, curve_store.curve_types_enum.bezier, gvariables_static.curve_color);
+                    // Add to the boundary curve list
+                    bndry_curves.Add(bezier);
+                    continue;

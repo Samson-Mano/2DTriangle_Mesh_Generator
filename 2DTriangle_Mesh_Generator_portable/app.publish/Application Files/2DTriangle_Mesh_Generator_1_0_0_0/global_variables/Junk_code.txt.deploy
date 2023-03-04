@@ -1,0 +1,112 @@
+﻿   //foreach (point_store pt in BW_delaunay.points_data.get_all_points())
+            //{
+            //    point_d t_pt1 = new point_d(pt.pt_coord.x / spacing_scale, pt.pt_coord.y / spacing_scale);
+
+            //    //if (pt.pt_id == 0 || pt.pt_id == 1 || pt.pt_id == 2)
+            //    //    continue;
+
+
+            //    this.result_pts_data.add_point(t_pt1, pt.pt_type);
+            //}
+
+            //// Add to result edges data
+            //foreach (edge_store ed in BW_delaunay.edges_data.get_all_edges())
+            //{
+
+            //    point_d spt = this.result_pts_data.get_point(ed.start_pt_id).pt_coord;
+            //    point_d ept = this.result_pts_data.get_point(ed.end_pt_id).pt_coord;
+            //    point_d mid_pt = delaunay_triangulation.get_edge_midpt(spt, ept);
+            //    double e_len = delaunay_triangulation.get_edge_length(spt, ept);
+            //    bool is_bndry_edge = true;
+            //    if (this.result_pts_data.get_point(ed.start_pt_id).pt_type == 3 ||
+            //        this.result_pts_data.get_point(ed.end_pt_id).pt_type == 3)
+            //    {
+            //        is_bndry_edge = false;
+            //    }
+            //    this.result_edge_data.add_edge(ed.start_pt_id, ed.end_pt_id, mid_pt, e_len, is_bndry_edge);
+            //}
+
+            //// Add to result triangle data
+            //foreach (triangle_store tri in BW_delaunay.triangles_data.get_all_triangles())
+            //{
+            //    point_d pt1 = this.result_pts_data.get_point(tri.pt1_id).pt_coord;
+            //    point_d pt2 = this.result_pts_data.get_point(tri.pt2_id).pt_coord;
+            //    point_d pt3 = this.result_pts_data.get_point(tri.pt3_id).pt_coord;
+            //    point_d tri_mid = delaunay_triangulation.get_triangle_midpt(pt1, pt2, pt3);
+            //    point_d circum_center = delaunay_triangulation.get_triangle_incircle_center(pt1, pt2, pt3);
+
+            //    double e_len1 = delaunay_triangulation.get_edge_length(pt1, pt2);
+            //    double e_len2 = delaunay_triangulation.get_edge_length(pt2, pt3);
+            //    double e_len3 = delaunay_triangulation.get_edge_length(pt3, pt1);
+            //    double shortest_len = delaunay_triangulation.get_minimum_of_three(e_len1, e_len2, e_len3);
+            //    double circum_radius = delaunay_triangulation.get_edge_length(pt1, circum_center);
+
+            //    this.result_tri_data.add_triangle(tri.pt1_id, tri.pt2_id, tri.pt3_id, tri.e1_id, tri.e2_id, tri.e3_id,
+            //       tri_mid, circum_center, shortest_len, circum_radius);
+            //}
+
+
+
+            
+        /*
+        private void remove_triangles_outside_surface(List<point_d> sc_outter_bndry_pts, List<List<point_d>> sc_inner_bndry_pts)
+        {
+            // Find all the points which are not inside the meshed surface
+            HashSet<int> delete_pts = new HashSet<int>();
+
+            foreach (point_store pts in BW_delaunay.points_data.get_all_points())
+            {
+                if (is_point_in_surface(pts.pt_coord, sc_outter_bndry_pts, sc_inner_bndry_pts) == false)
+                {
+                    // Add the point id to be deleted to the list
+                    delete_pts.Add(pts.pt_id);
+                }
+            }
+
+
+            // remove all the edges attached to points
+            HashSet<int> delete_edge = new HashSet<int>();
+
+            foreach (int pt_id in delete_pts)
+            {
+                delete_edge.UnionWith(BW_delaunay.edges_data.get_specific_edge_with_endpt(pt_id));
+            }
+
+            // Find the edges with midpt outside the mesh surface
+            foreach (edge_store ed in BW_delaunay.edges_data.get_all_edges())
+            {
+                if (is_point_in_surface(ed.mid_pt, sc_outter_bndry_pts, sc_inner_bndry_pts) == false)
+                {
+                    delete_edge.Add(ed.edge_id);
+                }
+            }
+
+
+            // Remove all the triangles attached to the edges
+            HashSet<int> delete_triangles = new HashSet<int>();
+
+            foreach (int edge_id in delete_edge)
+            {
+                edge_store ed = BW_delaunay.edges_data.get_edge(edge_id);
+
+                if (ed.left_triangle_id != -1)
+                {
+                    delete_triangles.Add(ed.left_triangle_id);
+                }
+
+                if (ed.right_triangle_id != -1)
+                {
+                    delete_triangles.Add(ed.right_triangle_id);
+                }
+
+                // Deleting the edges here
+                BW_delaunay.edges_data.remove_edge(edge_id);
+            }
+
+            foreach (int tri_id in delete_triangles)
+            {
+                // Deleting the triangles here
+                BW_delaunay.triangles_data.remove_triangle(tri_id);
+            }
+        }
+        */
