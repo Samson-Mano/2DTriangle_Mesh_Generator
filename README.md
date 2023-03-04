@@ -1,4 +1,4 @@
-# 2DTriangle_Mesh_Generator
+# 2D Triangle Mesh Generator
 
 The 2D Triangle Mesh Generator is a program designed to create 2D meshes for any number of surfaces, including multiple nested surfaces, and can handle a large number of elements. This program utilizes model openGL to render the mesh, making it capable of handling millions of elements without issues. 
 
